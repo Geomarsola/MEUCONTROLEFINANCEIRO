@@ -1,0 +1,58 @@
+
+# ========================================
+# LOGS
+# ========================================
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ========================================
+# DEPENDÊNCIAS
+# ========================================
+node_modules/
+
+# ========================================
+# ARQUIVOS GERADOS PELO BUILD
+# ========================================
+dist/
+dist-ssr/
+*.local
+
+# ========================================
+# VARIÁVEIS DE AMBIENTE
+# ========================================
+.env
+.env.*
+!.env.example
+
+# ========================================
+# BANCO DE DADOS E BACKUPS LOCAIS
+# ========================================
+*.sql
+*.sqlite
+*.db
+*.bak
+
+# ========================================
+# EDITORES E IDEs
+# ========================================
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ========================================
+# SISTEMA OPERACIONAL
+# ========================================
+Thumbs.db
+Desktop.ini
