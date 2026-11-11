@@ -1,289 +1,369 @@
 /* ========================================
-   1. CONFIGURAÇÕES GERAIS
-   ======================================== */
+   PAINEL PRINCIPAL - MEU CONTROLE FINANCEIRO
+======================================== */
 
-:root {
-  --cor-principal: #1e3a8a;
-  --cor-principal-hover: #1e40af;
-  --cor-fundo: #f3f4f6;
-  --cor-texto: #1f2937;
-  --cor-branco: #ffffff;
-  --cor-borda: #e5e7eb;
-
-  --cor-receita: #16a34a;
-  --cor-despesa: #dc2626;
-
-  --cor-excluir: #dc2626;
-  --cor-excluir-hover: #991b1b;
-
-  font-family: Arial, sans-serif;
-  color: var(--cor-texto);
-  background: var(--cor-fundo);
-}
-
-/* Remove margens e espaçamentos padrões dos elementos */
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
 
-/* Configura a altura mínima da página */
-body {
+body:not(.pagina-autenticacao) {
+  margin: 0;
   min-height: 100vh;
+  background: #f1f8f2;
+  color: #26352a;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Área principal da aplicação */
-#app {
-  width: 100%;
-  min-height: 100vh;
+/* CABEÇALHO */
+
+body:not(.pagina-autenticacao) header {
+  background: linear-gradient(135deg, #1b5e20, #2e7d32);
+  color: white;
+  padding: 30px 7%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  box-shadow: 0 4px 15px rgba(27, 94, 32, 0.18);
 }
 
-/* ========================================
-   2. CABEÇALHO DO SISTEMA
-   ======================================== */
-
-/* Define o visual do cabeçalho */
-header {
-  background: var(--cor-principal);
-  color: var(--cor-branco);
-  padding: 30px;
+body:not(.pagina-autenticacao) header h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
 }
 
-/* Espaçamento do título do cabeçalho */
-header h1 {
-  margin-bottom: 8px;
+body:not(.pagina-autenticacao) header p {
+  margin: 0;
+  color: #e8f5e9;
 }
 
-/* ========================================
-   3. CONTEÚDO PRINCIPAL
-   ======================================== */
-
-/* Centraliza e limita a largura do conteúdo */
-main {
-  max-width: 1100px;
-  margin: 30px auto;
-  padding: 0 20px;
+body:not(.pagina-autenticacao) .usuario-logado {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
-/* Estilo padrão das seções */
-section {
-  background: var(--cor-branco);
-  border: 1px solid var(--cor-borda);
-  border-radius: 10px;
-  padding: 25px;
-  margin-bottom: 20px;
+/* BOTÃO SAIR */
+
+#btn-sair {
+  padding: 10px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+  background: transparent;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
 }
 
-/* Títulos das seções */
-section h2 {
-  margin-bottom: 15px;
+#btn-sair:hover {
+  background: white;
+  color: #1b5e20;
+}
+
+/* CONTEÚDO PRINCIPAL */
+
+body:not(.pagina-autenticacao) main {
+  width: 90%;
+  max-width: 1200px;
+  margin: 35px auto;
+}
+
+/* SEÇÕES */
+
+body:not(.pagina-autenticacao) main section {
+  margin-bottom: 30px;
+  padding: 28px;
+  background: white;
+  border: 1px solid #dce8dd;
+  border-radius: 15px;
+  box-shadow: 0 5px 18px rgba(27, 94, 32, 0.06);
+}
+
+body:not(.pagina-autenticacao) main section h2 {
+  margin-top: 0;
+  margin-bottom: 22px;
+  color: #1b5e20;
   font-size: 22px;
 }
 
-/* ========================================
-   4. RESUMO FINANCEIRO
-   ======================================== */
+/* CARDS DO RESUMO */
 
-/* Organiza os cartões em três colunas */
 .cards-resumo {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 }
 
-/* Aparência dos cartões financeiros */
 .card {
-  background: var(--cor-branco);
-  border: 1px solid var(--cor-borda);
-  border-radius: 10px;
-  padding: 20px;
+  padding: 22px;
+  border-radius: 12px;
+  background: #f1f8f2;
+  border: 1px solid #dce8dd;
 }
 
-/* Títulos dos cartões */
+.cards-resumo .card:nth-child(1) {
+  background: #e8f5e9;
+  border-left: 5px solid #219653;
+}
+
+.cards-resumo .card:nth-child(2) {
+  background: #fff0f0;
+  border-left: 5px solid #dc4545;
+}
+
+.cards-resumo .card:nth-child(3) {
+  background: #e8f0fe;
+  border-left: 5px solid #3975c6;
+}
+
 .card h3 {
-  font-size: 16px;
-  color: #6b7280;
-  margin-bottom: 12px;
+  margin-top: 0;
+  color: #526354;
+  font-size: 15px;
 }
 
-/* Valores apresentados nos cartões */
 .card p {
-  font-size: 24px;
+  margin-bottom: 0;
+  font-size: 25px;
   font-weight: bold;
-  color: var(--cor-principal);
+  color: #1b5e20;
 }
 
-/* ========================================
-   5. FORMULÁRIO DE MOVIMENTAÇÕES
-   ======================================== */
+/* FORMULÁRIO */
 
-/* Organiza os campos em duas colunas */
 #form-movimentacao {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  gap: 18px;
 }
 
-/* Organiza cada campo do formulário */
-.campo {
+#form-movimentacao .campo {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-/* Legendas dos campos */
-.campo label {
+#form-movimentacao label {
+  color: #26352a;
   font-size: 14px;
   font-weight: bold;
-  color: #374151;
 }
 
-/* Campos de texto e seletores */
-.campo input,
-.campo select {
+#form-movimentacao input,
+#form-movimentacao select {
   width: 100%;
-  padding: 12px;
-  border: 1px solid #d1d5db;
+  padding: 13px;
+  border: 1px solid #c8dfca;
   border-radius: 8px;
+  background: #fbfdfb;
+  color: #26352a;
   font-size: 15px;
   outline: none;
 }
 
-/* Destaque ao selecionar um campo */
-.campo input:focus,
-.campo select:focus {
-  border-color: var(--cor-principal);
+#form-movimentacao input:focus,
+#form-movimentacao select:focus {
+  border-color: #2e7d32;
+  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.12);
 }
 
-/* Botão principal do formulário */
+/* BOTÕES DO FORMULÁRIO */
+
 #form-movimentacao button {
-  grid-column: 1 / -1;
-  padding: 14px;
-  background: var(--cor-principal);
-  color: var(--cor-branco);
+  padding: 14px 20px;
   border: none;
   border-radius: 8px;
-  font-size: 16px;
+  background: #1b5e20;
+  color: white;
   font-weight: bold;
   cursor: pointer;
-  transition: 0.3s;
+  transition: 0.2s;
 }
 
-/* Efeito ao passar o mouse no botão do formulário */
 #form-movimentacao button:hover {
-  background: var(--cor-principal-hover);
+  background: #2e7d32;
+  transform: translateY(-2px);
 }
 
-/* ========================================
-   6. IDENTIFICAÇÃO DAS MOVIMENTAÇÕES
-   ======================================== */
-
-/* Destaque verde para receitas */
-.card.receita {
-  border-left: 5px solid var(--cor-receita);
+#btn-cancelar {
+  background: #718074 !important;
 }
 
-/* Destaque vermelho para despesas */
-.card.despesa {
-  border-left: 5px solid var(--cor-despesa);
+/* LISTA DE MOVIMENTAÇÕES */
+
+#lista-movimentacoes {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
 }
 
-/* Texto que identifica o tipo de movimentação */
-.tipo-movimentacao {
-  font-weight: bold;
+#lista-movimentacoes .card {
+  background: #ffffff;
+  border-left: 5px solid #219653;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
 }
 
-/* Cor do texto das receitas */
-.card.receita .tipo-movimentacao {
-  color: var(--cor-receita);
+#lista-movimentacoes .card.despesa {
+  border-left-color: #dc4545;
 }
 
-/* Cor do texto das despesas */
-.card.despesa .tipo-movimentacao {
-  color: var(--cor-despesa);
-}
-
-/* Título de cada movimentação cadastrada */
 #lista-movimentacoes .card h3 {
-  color: var(--cor-texto);
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 12px;
-  text-transform: capitalize;
+  color: #1b5e20;
+  font-size: 18px;
 }
 
-/* ========================================
-   7. BOTÕES DE AÇÃO
-   ======================================== */
+#lista-movimentacoes .card p {
+  font-size: 15px;
+  color: #526354;
+}
 
-/* Configuração padrão dos botões Editar e Excluir */
-.btn-editar,
-.btn-excluir {
-  color: var(--cor-branco);
+#lista-movimentacoes .card button {
+  padding: 9px 15px;
+  margin-right: 8px;
   border: none;
-  padding: 9px 16px;
-  border-radius: 6px;
-  font-weight: bold;
+  border-radius: 7px;
   cursor: pointer;
-  transition: 0.3s;
+  font-weight: bold;
 }
 
-/* Botão de editar movimentação */
-.btn-editar {
-  background-color: var(--cor-principal);
+#lista-movimentacoes .btn-editar {
+  background: #e8f5e9;
+  color: #1b5e20;
 }
 
-/* Efeito ao passar o mouse no botão Editar */
-.btn-editar:hover {
-  background-color: var(--cor-principal-hover);
-  transform: scale(1.05);
+#lista-movimentacoes .btn-excluir {
+  background: #ffebee;
+  color: #c62828;
 }
 
-/* Botão de excluir movimentação */
-.btn-excluir {
-  background-color: var(--cor-excluir);
-}
+/* RESPONSIVIDADE */
 
-/* Efeito ao passar o mouse no botão Excluir */
-.btn-excluir:hover {
-  background-color: var(--cor-excluir-hover);
-  transform: scale(1.05);
-}
-
-/* ========================================
-   8. RESPONSIVIDADE PARA CELULARES
-   ======================================== */
-
-/* Ajusta o sistema para telas menores */
-@media (max-width: 600px) {
-  /* Reduz o espaçamento do cabeçalho */
-  header {
-    padding: 22px 20px;
+@media (max-width: 750px) {
+  body:not(.pagina-autenticacao) header {
+    padding: 25px;
+    flex-direction: column;
+    align-items: flex-start;
   }
 
-  /* Reduz o tamanho do título */
-  header h1 {
-    font-size: 25px;
-  }
-
-  /* Ajusta o espaçamento do conteúdo */
-  main {
-    margin-top: 20px;
-  }
-
-  /* Reduz o espaçamento interno das seções */
-  section {
-    padding: 18px;
-  }
-
-  /* Exibe os cartões um abaixo do outro */
   .cards-resumo {
     grid-template-columns: 1fr;
   }
 
-  /* Exibe os campos do formulário em uma coluna */
   #form-movimentacao {
     grid-template-columns: 1fr;
+  }
+
+  #lista-movimentacoes {
+    grid-template-columns: 1fr;
+  }
+
+  body:not(.pagina-autenticacao) main {
+    width: 94%;
+  }
+}
+
+@media (max-width: 480px) {
+  body:not(.pagina-autenticacao) main section {
+    padding: 20px;
+  }
+
+  body:not(.pagina-autenticacao) header h1 {
+    font-size: 23px;
+  }
+}
+
+/* ========================================
+   CORREÇÃO FINAL - LOGIN E CADASTRO
+======================================== */
+
+body.pagina-autenticacao {
+  min-height: 100vh !important;
+  margin: 0 !important;
+  padding: 25px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: linear-gradient(135deg, #e8f5e9, #c8e6c9) !important;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body.pagina-autenticacao main,
+body.pagina-autenticacao .area-autenticacao {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: auto !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+body.pagina-autenticacao .container-autenticacao {
+  width: 100% !important;
+  max-width: 440px !important;
+  padding: 40px !important;
+  background: #ffffff !important;
+  border: 1px solid #dce8dd !important;
+  border-radius: 18px !important;
+  box-shadow: 0 12px 35px rgba(27, 94, 32, 0.12) !important;
+}
+
+body.pagina-autenticacao .container-autenticacao h1 {
+  color: #1b5e20 !important;
+  text-align: center;
+}
+
+body.pagina-autenticacao .container-autenticacao p {
+  color: #718074;
+  text-align: center;
+}
+
+body.pagina-autenticacao .container-autenticacao label {
+  color: #26352a;
+  font-weight: bold;
+}
+
+body.pagina-autenticacao .container-autenticacao input {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #c8dfca;
+  border-radius: 9px;
+  background: #fbfdfb;
+  box-sizing: border-box;
+}
+
+body.pagina-autenticacao .container-autenticacao button {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 9px;
+  background: #1b5e20;
+  color: #ffffff;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+body.pagina-autenticacao .container-autenticacao button:hover {
+  background: #2e7d32;
+}
+
+body.pagina-autenticacao .container-autenticacao a {
+  color: #2e7d32;
+  font-weight: bold;
+}
+
+@media (max-width: 480px) {
+  body.pagina-autenticacao {
+    padding: 15px !important;
+  }
+
+  body.pagina-autenticacao .container-autenticacao {
+    padding: 28px 22px !important;
   }
 }

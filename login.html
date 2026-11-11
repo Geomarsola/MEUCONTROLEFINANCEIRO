@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Entrar | Meu Controle Financeiro</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+
+  <body class="pagina-autenticacao">
+    <main class="area-autenticacao">
+      <section class="cadastro-container container-autenticacao">
+        <div class="icone-autenticacao">💚</div>
+
+        <h1>Meu Controle Financeiro</h1>
+        <p class="subtitulo-autenticacao">Entre na sua conta para continuar.</p>
+
+        <form id="form-login">
+          <div class="campo">
+            <label for="email">E-mail</label>
+            <input type="email" id="email" placeholder="Digite seu e-mail" required />
+          </div>
+
+          <div class="campo">
+            <label for="senha">Senha</label>
+            <input type="password" id="senha" placeholder="Digite sua senha" required />
+          </div>
+
+          <p id="mensagem"></p>
+
+          <button type="submit" id="btn-entrar">Entrar</button>
+        </form>
+
+        <p class="rodape-autenticacao">
+          Ainda não tem conta?
+          <a href="/cadastro.html">Criar minha conta</a>
+        </p>
+      </section>
+    </main>
+
+    <script type="module" src="/src/login.js"></script>
+  </body>
+</html>

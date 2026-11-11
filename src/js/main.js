@@ -5,7 +5,6 @@ import "../style.css";
 // ========================================
 
 let movimentacoes = [];
-
 let idEmEdicao = null;
 
 const API = "http://localhost:3000/api";
@@ -13,157 +12,216 @@ const API = "http://localhost:3000/api";
 console.log("MEU CONTROLE FINANCEIRO INICIADO!");
 
 // ========================================
-// 2. ESTRUTURA HTML
+// 2. VERIFICAR SESSÃO NO SERVIDOR
+// ========================================
+
+let usuario;
+
+try {
+  const resposta = await fetch(`${API}/me`, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  if (!resposta.ok) {
+    localStorage.removeItem("usuario");
+    window.location.href = "/login.html";
+    throw new Error("Sessão não encontrada.");
+  }
+
+  const resultado = await resposta.json();
+
+  usuario = resultado.usuario;
+
+  if (!usuario || !usuario.id || !usuario.nome) {
+    throw new Error("Dados do usuário inválidos.");
+  }
+
+  localStorage.setItem("usuario", JSON.stringify(usuario));
+} catch (erro) {
+  console.error("Erro ao verificar sessão:", erro);
+
+  localStorage.removeItem("usuario");
+  window.location.href = "/login.html";
+
+  throw erro;
+}
+
+// ========================================
+// 3. ESTRUTURA HTML
 // ========================================
 
 const app = document.querySelector("#app");
 
 app.innerHTML = `
-  <header>
-    <h1>Meu Controle Financeiro</h1>
-    <p>Organize suas finanças em um só lugar.</p>
-  </header>
+    <header>
+        <h1>Meu Controle Financeiro</h1>
+        <p>Organize suas finanças em um só lugar.</p>
 
-  <main>
-
-    <section id="resumo">
-      <h2>Resumo financeiro</h2>
-
-      <div class="cards-resumo">
-
-        <div class="card">
-          <h3>Receitas</h3>
-          <p id="total-receitas">R$ 0,00</p>
+        <div class="usuario-logado">
+            <p>Olá, <strong id="nome-usuario"></strong>! 👋</p>
+            <button type="button" id="btn-sair">Sair</button>
         </div>
+    </header>
 
-        <div class="card">
-          <h3>Despesas</h3>
-          <p id="total-despesas">R$ 0,00</p>
-        </div>
+    <main>
 
-        <div class="card">
-          <h3>Saldo</h3>
-          <p id="saldo-total">R$ 0,00</p>
-        </div>
+        <section id="resumo">
+            <h2>Resumo financeiro</h2>
 
-      </div>
-    </section>
+            <div class="cards-resumo">
+                <div class="card">
+                    <h3>Receitas</h3>
+                    <p id="total-receitas">R$ 0,00</p>
+                </div>
 
-    <section id="receitas">
+                <div class="card">
+                    <h3>Despesas</h3>
+                    <p id="total-despesas">R$ 0,00</p>
+                </div>
 
-      <h2 id="titulo-formulario">Nova movimentação</h2>
+                <div class="card">
+                    <h3>Saldo</h3>
+                    <p id="saldo-total">R$ 0,00</p>
+                </div>
+            </div>
+        </section>
 
-      <form id="form-movimentacao">
+        <section id="receitas">
+            <h2 id="titulo-formulario">Nova movimentação</h2>
 
-        <div class="campo">
-          <label for="descricao">Descrição</label>
-          <input
-            type="text"
-            id="descricao"
-            placeholder="Ex.: Salário, aluguel..."
-            required
-          >
-        </div>
+            <form id="form-movimentacao">
 
-        <div class="campo">
-          <label for="valor">Valor (R$)</label>
-          <input
-            type="number"
-            id="valor"
-            placeholder="0,00"
-            step="0.01"
-            min="0.01"
-            required
-          >
-        </div>
+                <div class="campo">
+                    <label for="descricao">Descrição</label>
+                    <input
+                        type="text"
+                        id="descricao"
+                        placeholder="Ex.: Salário, aluguel..."
+                        required
+                    >
+                </div>
 
-        <div class="campo">
-          <label for="tipo">Tipo</label>
-          <select id="tipo" required>
-            <option value="">Selecione</option>
-            <option value="receita">Receita</option>
-            <option value="despesa">Despesa</option>
-          </select>
-        </div>
+                <div class="campo">
+                    <label for="valor">Valor (R$)</label>
+                    <input
+                        type="number"
+                        id="valor"
+                        placeholder="0,00"
+                        step="0.01"
+                        min="0.01"
+                        required
+                    >
+                </div>
 
-        <div class="campo">
-          <label for="categoria">Categoria</label>
-          <select id="categoria" required>
-            <option value="">Selecione uma categoria</option>
-            <option value="salario">Salário</option>
-            <option value="alimentacao">Alimentação</option>
-            <option value="moradia">Moradia</option>
-            <option value="transporte">Transporte</option>
-            <option value="outros">Outros</option>
-          </select>
-        </div>
+                <div class="campo">
+                    <label for="tipo">Tipo</label>
+                    <select id="tipo" required>
+                        <option value="">Selecione</option>
+                        <option value="receita">Receita</option>
+                        <option value="despesa">Despesa</option>
+                    </select>
+                </div>
 
-        <div class="campo">
-          <label for="data">Data da movimentação</label>
-          <input type="date" id="data" required>
-        </div>
+                <div class="campo">
+                    <label for="categoria">Categoria</label>
+                    <select id="categoria" required>
+                        <option value="">Selecione uma categoria</option>
+                        <option value="salario">Salário</option>
+                        <option value="alimentacao">Alimentação</option>
+                        <option value="moradia">Moradia</option>
+                        <option value="transporte">Transporte</option>
+                        <option value="outros">Outros</option>
+                    </select>
+                </div>
 
-        <button type="submit" id="btn-salvar">
-          Cadastrar movimentação
-        </button>
+                <div class="campo">
+                    <label for="data">Data da movimentação</label>
+                    <input type="date" id="data" required>
+                </div>
 
-        <button
-          type="button"
-          id="btn-cancelar"
-          style="display: none;"
-        >
-          Cancelar edição
-        </button>
+                <button type="submit" id="btn-salvar">
+                    Cadastrar movimentação
+                </button>
 
-      </form>
+                <button
+                    type="button"
+                    id="btn-cancelar"
+                    style="display: none;"
+                >
+                    Cancelar edição
+                </button>
 
-    </section>
+            </form>
+        </section>
 
-    <section id="movimentacoes">
-      <h2>Movimentações</h2>
+        <section id="movimentacoes">
+            <h2>Movimentações</h2>
 
-      <div id="lista-movimentacoes">
-        <p>Carregando movimentações...</p>
-      </div>
-    </section>
+            <div id="lista-movimentacoes">
+                <p>Carregando movimentações...</p>
+            </div>
+        </section>
 
-  </main>
+    </main>
 `;
 
 // ========================================
-// 3. CAPTURAR ELEMENTOS
+// 4. MOSTRAR NOME DO USUÁRIO
+// ========================================
+
+document.querySelector("#nome-usuario").textContent = usuario.nome;
+
+// ========================================
+// 5. BOTÃO SAIR
+// ========================================
+
+document.querySelector("#btn-sair").addEventListener("click", async () => {
+  const confirmar = confirm("Deseja realmente sair da sua conta?");
+
+  if (!confirmar) return;
+
+  try {
+    const resposta = await fetch(`${API}/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+
+    if (!resposta.ok) {
+      throw new Error("Não foi possível encerrar a sessão.");
+    }
+
+    localStorage.removeItem("usuario");
+
+    window.location.href = "/login.html";
+  } catch (erro) {
+    console.error("Erro ao sair:", erro);
+    alert("Não foi possível encerrar a sessão.");
+  }
+});
+
+// ========================================
+// 6. CAPTURAR ELEMENTOS
 // ========================================
 
 const formulario = document.querySelector("#form-movimentacao");
-
 const botaoSalvar = document.querySelector("#btn-salvar");
-
 const botaoCancelar = document.querySelector("#btn-cancelar");
-
 const tituloFormulario = document.querySelector("#titulo-formulario");
 
 // ========================================
-// 4. FORMATAR DATA
+// 7. FORMATAR DATA
 // ========================================
 
 function formatarData(data) {
-  if (!data) {
-    return "Data não informada";
-  }
+  if (!data) return "Data não informada";
 
-  let dataTexto;
-
-  if (typeof data === "string") {
-    dataTexto = data.slice(0, 10);
-  } else {
-    dataTexto = new Date(data).toISOString().slice(0, 10);
-  }
+  const dataTexto =
+    typeof data === "string" ? data.slice(0, 10) : new Date(data).toISOString().slice(0, 10);
 
   const partes = dataTexto.split("-");
 
-  if (partes.length !== 3) {
-    return "Data inválida";
-  }
+  if (partes.length !== 3) return "Data inválida";
 
   const [ano, mes, dia] = partes;
 
@@ -171,12 +229,20 @@ function formatarData(data) {
 }
 
 // ========================================
-// 5. CARREGAR MOVIMENTAÇÕES DO MYSQL
+// 8. CARREGAR MOVIMENTAÇÕES
 // ========================================
 
 async function carregarMovimentacoes() {
   try {
-    const resposta = await fetch(`${API}/movimentacoes`);
+    const resposta = await fetch(`${API}/movimentacoes`, {
+      credentials: "include",
+    });
+
+    if (resposta.status === 401) {
+      localStorage.removeItem("usuario");
+      window.location.href = "/login.html";
+      return;
+    }
 
     if (!resposta.ok) {
       throw new Error("Não foi possível buscar as movimentações.");
@@ -185,7 +251,6 @@ async function carregarMovimentacoes() {
     movimentacoes = await resposta.json();
 
     mostrarMovimentacoes();
-
     atualizarResumo();
   } catch (erro) {
     console.error("Erro ao carregar movimentações:", erro);
@@ -196,7 +261,7 @@ async function carregarMovimentacoes() {
 }
 
 // ========================================
-// 6. MOSTRAR MOVIMENTAÇÕES NA TELA
+// 9. MOSTRAR MOVIMENTAÇÕES
 // ========================================
 
 function mostrarMovimentacoes() {
@@ -206,41 +271,30 @@ function mostrarMovimentacoes() {
 
   if (movimentacoes.length === 0) {
     lista.innerHTML = "<p>Nenhuma movimentação cadastrada.</p>";
-
     return;
   }
 
   movimentacoes.forEach(function (movimentacao) {
     const card = document.createElement("div");
-
     card.className = `card ${movimentacao.tipo}`;
 
-    // Descrição
     const titulo = document.createElement("h3");
     titulo.textContent = movimentacao.descricao;
 
-    // Valor
     const valor = document.createElement("p");
-
     valor.textContent = `Valor: ${Number(movimentacao.valor).toLocaleString("pt-BR", {
       style: "currency",
       currency: "BRL",
     })}`;
 
-    // Tipo
     const tipo = document.createElement("p");
     tipo.className = "tipo-movimentacao";
-
     tipo.textContent = movimentacao.tipo === "receita" ? "Receita" : "Despesa";
 
-    // Data
     const data = document.createElement("p");
-
     data.textContent = `Data: ${formatarData(movimentacao.data)}`;
 
-    // Botão editar
     const botaoEditar = document.createElement("button");
-
     botaoEditar.type = "button";
     botaoEditar.className = "btn-editar";
     botaoEditar.textContent = "Editar";
@@ -249,9 +303,7 @@ function mostrarMovimentacoes() {
       editarMovimentacao(movimentacao.id);
     });
 
-    // Botão excluir
     const botaoExcluir = document.createElement("button");
-
     botaoExcluir.type = "button";
     botaoExcluir.className = "btn-excluir";
     botaoExcluir.textContent = "Excluir";
@@ -260,7 +312,6 @@ function mostrarMovimentacoes() {
       excluirMovimentacao(movimentacao.id);
     });
 
-    // Adicionar elementos ao card
     card.appendChild(titulo);
     card.appendChild(valor);
     card.appendChild(tipo);
@@ -273,12 +324,11 @@ function mostrarMovimentacoes() {
 }
 
 // ========================================
-// 7. ATUALIZAR RESUMO FINANCEIRO
+// 10. ATUALIZAR RESUMO
 // ========================================
 
 function atualizarResumo() {
   let totalReceitas = 0;
-
   let totalDespesas = 0;
 
   movimentacoes.forEach(function (movimentacao) {
@@ -312,7 +362,7 @@ function atualizarResumo() {
 }
 
 // ========================================
-// 8. EDITAR MOVIMENTAÇÃO
+// 11. EDITAR MOVIMENTAÇÃO
 // ========================================
 
 function editarMovimentacao(id) {
@@ -322,17 +372,12 @@ function editarMovimentacao(id) {
 
   if (!movimentacao) {
     alert("Movimentação não encontrada.");
-
     return;
   }
 
-  // Preencher formulário
   document.querySelector("#descricao").value = movimentacao.descricao;
-
   document.querySelector("#valor").value = movimentacao.valor;
-
   document.querySelector("#tipo").value = movimentacao.tipo;
-
   document.querySelector("#categoria").value = movimentacao.categoria;
 
   const dataTexto =
@@ -342,17 +387,12 @@ function editarMovimentacao(id) {
 
   document.querySelector("#data").value = dataTexto;
 
-  // Guardar ID da movimentação
   idEmEdicao = movimentacao.id;
 
-  // Alterar título e botão
   tituloFormulario.textContent = "Editar movimentação";
-
   botaoSalvar.textContent = "Salvar alterações";
-
   botaoCancelar.style.display = "inline-block";
 
-  // Rolar até o formulário
   formulario.scrollIntoView({
     behavior: "smooth",
     block: "start",
@@ -360,7 +400,7 @@ function editarMovimentacao(id) {
 }
 
 // ========================================
-// 9. CANCELAR EDIÇÃO
+// 12. CANCELAR EDIÇÃO
 // ========================================
 
 function cancelarEdicao() {
@@ -369,37 +409,39 @@ function cancelarEdicao() {
   formulario.reset();
 
   tituloFormulario.textContent = "Nova movimentação";
-
   botaoSalvar.textContent = "Cadastrar movimentação";
-
   botaoCancelar.style.display = "none";
 }
 
 botaoCancelar.addEventListener("click", cancelarEdicao);
 
 // ========================================
-// 10. EXCLUIR MOVIMENTAÇÃO NO MYSQL
+// 13. EXCLUIR MOVIMENTAÇÃO
 // ========================================
 
 async function excluirMovimentacao(id) {
   const confirmar = confirm("Deseja realmente excluir esta movimentação?");
 
-  if (!confirmar) {
-    return;
-  }
+  if (!confirmar) return;
 
   try {
     const resposta = await fetch(`${API}/movimentacoes/${id}`, {
       method: "DELETE",
+      credentials: "include",
     });
 
     const resultado = await resposta.json();
+
+    if (resposta.status === 401) {
+      localStorage.removeItem("usuario");
+      window.location.href = "/login.html";
+      return;
+    }
 
     if (!resposta.ok) {
       throw new Error(resultado.mensagem || "Erro ao excluir movimentação.");
     }
 
-    // Se estiver editando o registro excluído, cancelar edição
     if (Number(idEmEdicao) === Number(id)) {
       cancelarEdicao();
     }
@@ -409,26 +451,21 @@ async function excluirMovimentacao(id) {
     await carregarMovimentacoes();
   } catch (erro) {
     console.error("Erro ao excluir:", erro);
-
-    alert("Não foi possível excluir a movimentação.");
+    alert(erro.message);
   }
 }
 
 // ========================================
-// 11. CADASTRAR OU ATUALIZAR MOVIMENTAÇÃO
+// 14. CADASTRAR OU ATUALIZAR
 // ========================================
 
 formulario.addEventListener("submit", async function (event) {
   event.preventDefault();
 
   const descricao = document.querySelector("#descricao").value.trim();
-
   const valor = Number(document.querySelector("#valor").value);
-
   const tipo = document.querySelector("#tipo").value;
-
   const categoria = document.querySelector("#categoria").value;
-
   const data = document.querySelector("#data").value;
 
   const movimentacao = {
@@ -439,7 +476,6 @@ formulario.addEventListener("submit", async function (event) {
     data,
   };
 
-  // Definir se será cadastro ou atualização
   const editando = idEmEdicao !== null;
 
   const url = editando ? `${API}/movimentacoes/${idEmEdicao}` : `${API}/movimentacoes`;
@@ -449,25 +485,28 @@ formulario.addEventListener("submit", async function (event) {
   try {
     const resposta = await fetch(url, {
       method: metodo,
-
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
-
       body: JSON.stringify(movimentacao),
     });
 
     const resultado = await resposta.json();
 
+    if (resposta.status === 401) {
+      localStorage.removeItem("usuario");
+      window.location.href = "/login.html";
+      return;
+    }
+
     if (!resposta.ok) {
       throw new Error(resultado.mensagem || "Erro ao salvar movimentação.");
     }
 
-    if (editando) {
-      alert("Movimentação atualizada com sucesso!");
-    } else {
-      alert("Movimentação cadastrada com sucesso!");
-    }
+    alert(
+      editando ? "Movimentação atualizada com sucesso!" : "Movimentação cadastrada com sucesso!",
+    );
 
     cancelarEdicao();
 
@@ -476,13 +515,12 @@ formulario.addEventListener("submit", async function (event) {
     console.log("Operação realizada:", resultado);
   } catch (erro) {
     console.error("Erro ao salvar movimentação:", erro);
-
-    alert("Não foi possível salvar. Verifique se o servidor está ligado.");
+    alert(erro.message);
   }
 });
 
 // ========================================
-// 12. INICIAR A APLICAÇÃO
+// 15. INICIAR A APLICAÇÃO
 // ========================================
 
 carregarMovimentacoes();
