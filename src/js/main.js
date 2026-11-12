@@ -54,6 +54,10 @@ try {
 
 const app = document.querySelector("#app");
 
+if (!app) {
+  throw new Error("Elemento #app não encontrado no HTML.");
+}
+
 app.innerHTML = `
   <div class="dashboard-layout">
 
@@ -178,6 +182,7 @@ app.innerHTML = `
         <!-- RELATÓRIOS -->
 
         <section class="secao-relatorios">
+
           <div class="secao-titulo">
             <div>
               <h2>Relatórios</h2>
@@ -186,6 +191,16 @@ app.innerHTML = `
           </div>
 
           <div class="relatorio-controles">
+
+            <div class="campo">
+              <label for="tipo-relatorio">Tipo de relatório</label>
+              <select id="tipo-relatorio">
+                <option value="completo">Relatório completo</option>
+                <option value="receitas">Somente receitas</option>
+                <option value="despesas">Somente despesas</option>
+                <option value="investimentos">Somente investimentos</option>
+              </select>
+            </div>
 
             <div class="campo">
               <label for="periodo-relatorio">Período</label>
@@ -459,6 +474,15 @@ async function lerRespostaApi(resposta) {
   return resposta.json();
 }
 
+function verificarSessaoExpirada(resposta) {
+  if (resposta.status !== 401) return false;
+
+  localStorage.removeItem("usuario");
+  window.location.href = "/login.html";
+
+  return true;
+}
+
 // ========================================
 // 5. MOSTRAR USUÁRIO
 // ========================================
@@ -570,6 +594,8 @@ async function carregarCategorias() {
       credentials: "include",
     });
 
+    if (verificarSessaoExpirada(resposta)) return;
+
     if (!resposta.ok) {
       throw new Error("Não foi possível carregar as categorias.");
     }
@@ -605,6 +631,8 @@ document.querySelector("#btn-adicionar-categoria").addEventListener("click", asy
       },
       body: JSON.stringify({ nome, tipo }),
     });
+
+    if (verificarSessaoExpirada(resposta)) return;
 
     const resultado = await lerRespostaApi(resposta);
 
@@ -649,11 +677,7 @@ async function carregarMovimentacoes() {
       credentials: "include",
     });
 
-    if (resposta.status === 401) {
-      localStorage.removeItem("usuario");
-      window.location.href = "/login.html";
-      return;
-    }
+    if (verificarSessaoExpirada(resposta)) return;
 
     if (!resposta.ok) {
       throw new Error("Não foi possível buscar as movimentações.");
@@ -684,11 +708,7 @@ async function carregarInvestimentos() {
       credentials: "include",
     });
 
-    if (resposta.status === 401) {
-      localStorage.removeItem("usuario");
-      window.location.href = "/login.html";
-      return;
-    }
+    if (verificarSessaoExpirada(resposta)) return;
 
     if (!resposta.ok) {
       throw new Error("Não foi possível carregar os investimentos.");
@@ -793,7 +813,6 @@ formularioInvestimentos.addEventListener("submit", async (event) => {
 
   const valor = Number(document.querySelector("#valor-investido").value);
   const local_investimento = document.querySelector("#local-investimento").value.trim();
-
   const data_investimento = document.querySelector("#data-investimento").value;
   const status = document.querySelector("#status-investimento");
 
@@ -826,13 +845,9 @@ formularioInvestimentos.addEventListener("submit", async (event) => {
       body: JSON.stringify(dados),
     });
 
-    const resultado = await lerRespostaApi(resposta);
+    if (verificarSessaoExpirada(resposta)) return;
 
-    if (resposta.status === 401) {
-      localStorage.removeItem("usuario");
-      window.location.href = "/login.html";
-      return;
-    }
+    const resultado = await lerRespostaApi(resposta);
 
     if (!resposta.ok) {
       throw new Error(resultado.mensagem || "Não foi possível salvar o investimento.");
@@ -919,13 +934,9 @@ async function excluirInvestimento(id) {
       credentials: "include",
     });
 
-    const resultado = await lerRespostaApi(resposta);
+    if (verificarSessaoExpirada(resposta)) return;
 
-    if (resposta.status === 401) {
-      localStorage.removeItem("usuario");
-      window.location.href = "/login.html";
-      return;
-    }
+    const resultado = await lerRespostaApi(resposta);
 
     if (!resposta.ok) {
       throw new Error(resultado.mensagem || "Erro ao excluir investimento.");
@@ -990,8 +1001,10 @@ function obterIntervaloRelatorio() {
   };
 }
 
+// Data inicial do relatório
 document.querySelector("#data-relatorio").value = obterDataHoje();
 
+// Alternar período personalizado
 document.querySelector("#periodo-relatorio").addEventListener("change", (event) => {
   const personalizado = event.target.value === "personalizado";
 
@@ -1002,74 +1015,180 @@ document.querySelector("#periodo-relatorio").addEventListener("change", (event) 
   });
 });
 
+// ========================================
+// GERAR RELATÓRIO PDF
+// ========================================
+
 document.querySelector("#btn-baixar-relatorio").addEventListener("click", () => {
   const intervalo = obterIntervaloRelatorio();
+
+  const tipoRelatorio = document.querySelector("#tipo-relatorio").value;
 
   if (!intervalo.inicio || !intervalo.fim || intervalo.inicio > intervalo.fim) {
     alert("Informe um período válido.");
     return;
   }
 
-  const itens = movimentacoes
-    .filter(
-      (item) =>
-        String(item.data).slice(0, 10) >= intervalo.inicio &&
-        String(item.data).slice(0, 10) <= intervalo.fim,
-    )
+  // Filtrar movimentações pelo período
+  const movimentacoesPeriodo = movimentacoes
+    .filter((item) => {
+      const data = String(item.data).slice(0, 10);
+
+      return data >= intervalo.inicio && data <= intervalo.fim;
+    })
+    .filter((item) => {
+      if (tipoRelatorio === "receitas") {
+        return item.tipo === "receita";
+      }
+
+      if (tipoRelatorio === "despesas") {
+        return item.tipo === "despesa";
+      }
+
+      return tipoRelatorio === "completo";
+    })
     .sort((a, b) => String(a.data).localeCompare(String(b.data)));
 
+  // Filtrar investimentos pelo período
   const investimentosPeriodo = investimentos
-    .filter(
-      (item) =>
-        String(item.data_investimento).slice(0, 10) >= intervalo.inicio &&
-        String(item.data_investimento).slice(0, 10) <= intervalo.fim,
-    )
+    .filter((item) => {
+      const data = String(item.data_investimento).slice(0, 10);
+
+      return data >= intervalo.inicio && data <= intervalo.fim;
+    })
     .sort((a, b) => String(a.data_investimento).localeCompare(String(b.data_investimento)));
 
-  const totais = itens.reduce(
+  // Definir quais dados entram no relatório
+  const incluirReceitas = tipoRelatorio === "completo" || tipoRelatorio === "receitas";
+
+  const incluirDespesas = tipoRelatorio === "completo" || tipoRelatorio === "despesas";
+
+  const incluirInvestimentos = tipoRelatorio === "completo" || tipoRelatorio === "investimentos";
+
+  // Calcular totais
+  const totais = movimentacoesPeriodo.reduce(
     (acc, item) => {
-      acc[item.tipo] += Number(item.valor);
+      if (item.tipo === "receita") {
+        acc.receita += Number(item.valor) || 0;
+      }
+
+      if (item.tipo === "despesa") {
+        acc.despesa += Number(item.valor) || 0;
+      }
+
       return acc;
     },
     { receita: 0, despesa: 0 },
   );
 
   const totalInvestimentos = investimentosPeriodo.reduce(
-    (total, item) => total + Number(item.valor),
+    (total, item) => total + (Number(item.valor) || 0),
     0,
   );
 
-  // O saldo do relatório também não desconta os investimentos.
+  // Saldo não desconta investimentos
   const saldoPeriodo = totais.receita - totais.despesa;
 
-  const linhasMovimentacoes = itens
+  // Nome do relatório
+  const nomesRelatorios = {
+    completo: "Relatório financeiro completo",
+    receitas: "Relatório de receitas",
+    despesas: "Relatório de despesas",
+    investimentos: "Relatório de investimentos",
+  };
+
+  const tituloRelatorio = nomesRelatorios[tipoRelatorio];
+
+  // Montar linhas das movimentações
+  const linhasMovimentacoes = movimentacoesPeriodo
     .map(
       (item) => `
-    <tr>
-      <td>${formatarData(item.data)}</td>
-      <td>${escapeHtml(item.descricao)}</td>
-      <td>${escapeHtml(item.categoria || "Outros")}</td>
-      <td>${item.tipo === "receita" ? "Receita" : "Despesa"}</td>
-      <td>${formatarMoeda(item.valor)}</td>
-    </tr>
-  `,
+          <tr>
+            <td>${formatarData(item.data)}</td>
+            <td>${escapeHtml(item.descricao)}</td>
+            <td>${escapeHtml(item.categoria || "Outros")}</td>
+            <td>${item.tipo === "receita" ? "Receita" : "Despesa"}</td>
+            <td>${formatarMoeda(item.valor)}</td>
+          </tr>
+        `,
     )
     .join("");
 
+  // Montar linhas dos investimentos
   const linhasInvestimentos = investimentosPeriodo
     .map(
       (item) => `
-    <tr>
-      <td>${formatarData(item.data_investimento)}</td>
-      <td>${escapeHtml(item.local_investimento)}</td>
-      <td>Investimento</td>
-      <td>Aplicação</td>
-      <td>${formatarMoeda(item.valor)}</td>
-    </tr>
-  `,
+          <tr>
+            <td>${formatarData(item.data_investimento)}</td>
+            <td>${escapeHtml(item.local_investimento)}</td>
+            <td>Investimento</td>
+            <td>Aplicação</td>
+            <td>${formatarMoeda(item.valor)}</td>
+          </tr>
+        `,
     )
     .join("");
 
+  // Combinar registros conforme a opção escolhida
+  let linhas = "";
+
+  if (incluirReceitas || incluirDespesas) {
+    linhas += linhasMovimentacoes;
+  }
+
+  if (incluirInvestimentos) {
+    linhas += linhasInvestimentos;
+  }
+
+  // Montar os indicadores do relatório
+  let resumo = "";
+
+  if (incluirReceitas) {
+    resumo += `
+        <div class="indicador receita">
+          <span>Receitas</span>
+          <strong>${formatarMoeda(totais.receita)}</strong>
+        </div>
+      `;
+  }
+
+  if (incluirDespesas) {
+    resumo += `
+        <div class="indicador despesa">
+          <span>Despesas</span>
+          <strong>${formatarMoeda(totais.despesa)}</strong>
+        </div>
+      `;
+  }
+
+  if (incluirInvestimentos) {
+    resumo += `
+        <div class="indicador investimento">
+          <span>Investimentos</span>
+          <strong>${formatarMoeda(totalInvestimentos)}</strong>
+        </div>
+      `;
+  }
+
+  if (tipoRelatorio === "completo") {
+    resumo += `
+        <div class="indicador saldo">
+          <span>Saldo disponível</span>
+          <strong>${formatarMoeda(saldoPeriodo)}</strong>
+        </div>
+      `;
+  }
+
+  // Verificar se existem registros
+  if (!linhas) {
+    linhas = `
+        <tr>
+          <td colspan="5">Nenhum registro encontrado neste período.</td>
+        </tr>
+      `;
+  }
+
+  // Abrir janela do PDF
   const janela = window.open("", "_blank");
 
   if (!janela) {
@@ -1078,99 +1197,166 @@ document.querySelector("#btn-baixar-relatorio").addEventListener("click", () => 
   }
 
   janela.document.write(`
-    <!doctype html>
-    <html lang="pt-BR">
-    <head>
-      <meta charset="utf-8">
-      <title>${escapeHtml(intervalo.titulo)}</title>
+      <!doctype html>
+      <html lang="pt-BR">
 
-      <style>
-        body {
-          font: 14px Arial;
-          color: #26352a;
-          padding: 32px;
-        }
+      <head>
+        <meta charset="utf-8">
 
-        h1 {
-          color: #1b5e20;
-        }
+        <title>${escapeHtml(tituloRelatorio)}</title>
 
-        p {
-          color: #526354;
-        }
+        <style>
+          * {
+            box-sizing: border-box;
+          }
 
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-top: 24px;
-        }
-
-        th, td {
-          text-align: left;
-          padding: 10px;
-          border-bottom: 1px solid #dce5dd;
-        }
-
-        th {
-          background: #edf5ee;
-        }
-
-        .totais {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 20px;
-          margin-top: 20px;
-          font-weight: bold;
-        }
-
-        @media print {
           body {
-            padding: 0;
+            font-family: Arial, sans-serif;
+            color: #26352a;
+            padding: 32px;
           }
-        }
-      </style>
-    </head>
 
-    <body>
-      <h1>Meu Controle Financeiro</h1>
-      <h2>${escapeHtml(intervalo.titulo)}</h2>
-
-      <p>
-        ${formatarData(intervalo.inicio)} a ${formatarData(intervalo.fim)}
-      </p>
-
-      <div class="totais">
-        <span>Receitas: ${formatarMoeda(totais.receita)}</span>
-        <span>Despesas: ${formatarMoeda(totais.despesa)}</span>
-        <span>Investimentos: ${formatarMoeda(totalInvestimentos)}</span>
-        <span>Saldo disponível: ${formatarMoeda(saldoPeriodo)}</span>
-      </div>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Data</th>
-            <th>Descrição / Local</th>
-            <th>Categoria</th>
-            <th>Tipo</th>
-            <th>Valor</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          ${
-            linhasMovimentacoes + linhasInvestimentos ||
-            '<tr><td colspan="5">Nenhum registro no período.</td></tr>'
+          h1 {
+            color: #1b5e20;
+            margin-bottom: 5px;
           }
-        </tbody>
-      </table>
 
-      <script>
-        window.onload = () => window.print();
-      </script>
-    </body>
-    </html>
-  `);
+          h2 {
+            margin-top: 25px;
+          }
+
+          p {
+            color: #526354;
+          }
+
+          .cabecalho {
+            border-bottom: 2px solid #1b5e20;
+            padding-bottom: 15px;
+          }
+
+          .resumo {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+          }
+
+          .indicador {
+            padding: 15px;
+            border-radius: 8px;
+            background: #f1f5f2;
+          }
+
+          .indicador span {
+            display: block;
+            color: #526354;
+            margin-bottom: 8px;
+          }
+
+          .indicador strong {
+            font-size: 19px;
+          }
+
+          .receita strong {
+            color: #168044;
+          }
+
+          .despesa strong {
+            color: #d33c3c;
+          }
+
+          .investimento strong {
+            color: #7951c7;
+          }
+
+          .saldo strong {
+            color: #1b5e20;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+          }
+
+          th, td {
+            text-align: left;
+            padding: 10px;
+            border-bottom: 1px solid #dce5dd;
+          }
+
+          th {
+            background: #edf5ee;
+          }
+
+          .rodape {
+            margin-top: 35px;
+            font-size: 12px;
+            color: #777;
+            text-align: center;
+          }
+
+          @media print {
+            body {
+              padding: 0;
+            }
+          }
+        </style>
+      </head>
+
+      <body>
+
+        <div class="cabecalho">
+          <h1>Meu Controle Financeiro</h1>
+          <h2>${escapeHtml(tituloRelatorio)}</h2>
+
+          <p>
+            Período: ${formatarData(intervalo.inicio)}
+            até ${formatarData(intervalo.fim)}
+          </p>
+
+          <p>
+            Usuário: ${escapeHtml(usuario.nome)}
+          </p>
+        </div>
+
+        <h2>Resumo financeiro</h2>
+
+        <div class="resumo">
+          ${resumo}
+        </div>
+
+        <h2>Detalhamento dos registros</h2>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Descrição / Local</th>
+              <th>Categoria</th>
+              <th>Tipo</th>
+              <th>Valor</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            ${linhas}
+          </tbody>
+        </table>
+
+        <div class="rodape">
+          Meu Controle Financeiro © ${new Date().getFullYear()}
+        </div>
+
+        <script>
+          window.onload = () => {
+            window.print();
+          };
+        </script>
+
+      </body>
+      </html>
+    `);
 
   janela.document.close();
 });
@@ -1277,7 +1463,6 @@ function atualizarResumo() {
   let totalDespesas = 0;
   let totalInvestido = 0;
 
-  // Somar somente as receitas e despesas.
   movimentacoes.forEach((movimentacao) => {
     const valor = Number(movimentacao.valor) || 0;
 
@@ -1290,13 +1475,11 @@ function atualizarResumo() {
     }
   });
 
-  // Somar investimentos separadamente.
   investimentos.forEach((investimento) => {
     totalInvestido += Number(investimento.valor) || 0;
   });
 
-  // Saldo disponível: receitas menos despesas.
-  // Os investimentos NÃO são descontados.
+  // Investimentos não são descontados do saldo disponível.
   const saldo = totalReceitas - totalDespesas;
 
   document.querySelector("#total-receitas").textContent = formatarMoeda(totalReceitas);
@@ -1344,9 +1527,9 @@ function atualizarGrafico() {
     if (!mesEncontrado) return;
 
     if (item.tipo === "receita") {
-      mesEncontrado.receitas += Number(item.valor);
+      mesEncontrado.receitas += Number(item.valor) || 0;
     } else if (item.tipo === "despesa") {
-      mesEncontrado.despesas += Number(item.valor);
+      mesEncontrado.despesas += Number(item.valor) || 0;
     }
   });
 
@@ -1466,13 +1649,9 @@ async function excluirMovimentacao(id) {
       credentials: "include",
     });
 
-    const resultado = await lerRespostaApi(resposta);
+    if (verificarSessaoExpirada(resposta)) return;
 
-    if (resposta.status === 401) {
-      localStorage.removeItem("usuario");
-      window.location.href = "/login.html";
-      return;
-    }
+    const resultado = await lerRespostaApi(resposta);
 
     if (!resposta.ok) {
       throw new Error(resultado.mensagem || "Erro ao excluir movimentação.");
@@ -1533,13 +1712,9 @@ formulario.addEventListener("submit", async (event) => {
       body: JSON.stringify(movimentacao),
     });
 
-    const resultado = await lerRespostaApi(resposta);
+    if (verificarSessaoExpirada(resposta)) return;
 
-    if (resposta.status === 401) {
-      localStorage.removeItem("usuario");
-      window.location.href = "/login.html";
-      return;
-    }
+    const resultado = await lerRespostaApi(resposta);
 
     if (!resposta.ok) {
       throw new Error(resultado.mensagem || "Erro ao salvar movimentação.");
