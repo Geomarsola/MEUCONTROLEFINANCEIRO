@@ -5,7 +5,11 @@ import "../style.css";
 // ========================================
 
 let movimentacoes = [];
+let categorias = [];
+let investimentos = [];
+
 let idEmEdicao = null;
+let idInvestimentoEmEdicao = null;
 
 const API = "http://localhost:3000/api";
 
@@ -51,223 +55,377 @@ try {
 const app = document.querySelector("#app");
 
 app.innerHTML = `
-    <div class="dashboard-layout">
+  <div class="dashboard-layout">
 
-        <aside class="sidebar">
+    <aside class="sidebar">
 
-            <div class="sidebar-logo">
-                <div class="logo-icon">M</div>
-                <div>
-                    <h2>Meu Controle</h2>
-                    <span>Financeiro</span>
-                </div>
-            </div>
-
-            <nav class="sidebar-menu">
-                <span class="menu-titulo">MENU PRINCIPAL</span>
-
-                <a href="#dashboard" class="menu-link ativo">
-                    <span>▦</span>
-                    Dashboard
-                </a>
-
-                <a href="#movimentacoes" class="menu-link">
-                    <span>↔</span>
-                    Movimentações
-                </a>
-
-                <a href="#receitas" class="menu-link">
-                    <span>＋</span>
-                    Nova movimentação
-                </a>
-            </nav>
-
-            <div class="sidebar-rodape">
-                <div class="usuario-avatar" id="avatar-usuario">U</div>
-
-                <div class="usuario-info">
-                    <strong id="nome-sidebar"></strong>
-                    <span>Minha conta</span>
-                </div>
-
-                <button type="button" id="btn-sair" title="Sair">
-                    ↪
-                </button>
-            </div>
-
-        </aside>
-
-        <div class="dashboard-conteudo">
-
-            <header class="topbar">
-                <div>
-                    <h1>Dashboard</h1>
-                    <p>Bem-vindo ao seu controle financeiro!</p>
-                </div>
-
-                <div class="topbar-usuario">
-                    <span>Olá, <strong id="nome-usuario"></strong> 👋</span>
-                </div>
-            </header>
-
-            <main class="dashboard-main" id="dashboard">
-
-                <section class="secao-boas-vindas">
-                    <div>
-                        <span class="texto-destaque">VISÃO GERAL</span>
-                        <h2>Suas finanças em um só lugar.</h2>
-                        <p>Acompanhe suas receitas, despesas e seu saldo.</p>
-                    </div>
-
-                    <button type="button" id="btn-nova-movimentacao">
-                        + Nova movimentação
-                    </button>
-                </section>
-
-                <section id="resumo" class="secao-resumo">
-
-                    <div class="card-resumo receita-card">
-                        <div class="card-resumo-topo">
-                            <span>Receitas</span>
-                            <span class="card-icone">↗</span>
-                        </div>
-                        <h2 id="total-receitas">R$ 0,00</h2>
-                        <p>Total de entradas</p>
-                    </div>
-
-                    <div class="card-resumo despesa-card">
-                        <div class="card-resumo-topo">
-                            <span>Despesas</span>
-                            <span class="card-icone">↘</span>
-                        </div>
-                        <h2 id="total-despesas">R$ 0,00</h2>
-                        <p>Total de saídas</p>
-                    </div>
-
-                    <div class="card-resumo saldo-card">
-                        <div class="card-resumo-topo">
-                            <span>Saldo disponível</span>
-                            <span class="card-icone">R$</span>
-                        </div>
-                        <h2 id="saldo-total">R$ 0,00</h2>
-                        <p>Receitas menos despesas</p>
-                    </div>
-
-                </section>
-
-                <section class="secao-grafico">
-                    <div class="secao-titulo">
-                        <div>
-                            <h2>Visão financeira</h2>
-                            <p>Receitas e despesas dos últimos meses</p>
-                        </div>
-                    </div>
-
-                    <div id="grafico-mensal" class="grafico-mensal">
-                        <p>Carregando gráfico...</p>
-                    </div>
-                </section>
-
-                <section id="movimentacoes" class="secao-movimentacoes">
-                    <div class="secao-titulo">
-                        <div>
-                            <h2>Movimentações recentes</h2>
-                            <p>Acompanhe seus últimos lançamentos.</p>
-                        </div>
-                    </div>
-
-                    <div id="lista-movimentacoes">
-                        <p>Carregando movimentações...</p>
-                    </div>
-                </section>
-
-                <section id="receitas" class="secao-formulario">
-
-                    <div class="secao-titulo">
-                        <div>
-                            <h2 id="titulo-formulario">Nova movimentação</h2>
-                            <p>Registre suas receitas e despesas.</p>
-                        </div>
-                    </div>
-
-                    <form id="form-movimentacao">
-
-                        <div class="campo">
-                            <label for="descricao">Descrição</label>
-                            <input
-                                type="text"
-                                id="descricao"
-                                placeholder="Ex.: Salário, aluguel..."
-                                required
-                            >
-                        </div>
-
-                        <div class="campo">
-                            <label for="valor">Valor (R$)</label>
-                            <input
-                                type="number"
-                                id="valor"
-                                placeholder="0,00"
-                                step="0.01"
-                                min="0.01"
-                                required
-                            >
-                        </div>
-
-                        <div class="campo">
-                            <label for="tipo">Tipo</label>
-                            <select id="tipo" required>
-                                <option value="">Selecione</option>
-                                <option value="receita">Receita</option>
-                                <option value="despesa">Despesa</option>
-                            </select>
-                        </div>
-
-                        <div class="campo">
-                            <label for="categoria">Categoria</label>
-                            <select id="categoria" required>
-                                <option value="">Selecione uma categoria</option>
-                                <option value="salario">Salário</option>
-                                <option value="alimentacao">Alimentação</option>
-                                <option value="moradia">Moradia</option>
-                                <option value="transporte">Transporte</option>
-                                <option value="outros">Outros</option>
-                            </select>
-                        </div>
-
-                        <div class="campo">
-                            <label for="data">Data da movimentação</label>
-                            <input type="date" id="data" required>
-                        </div>
-
-                        <div class="botoes-formulario">
-                            <button type="submit" id="btn-salvar">
-                                Cadastrar movimentação
-                            </button>
-
-                            <button
-                                type="button"
-                                id="btn-cancelar"
-                                style="display: none;"
-                            >
-                                Cancelar edição
-                            </button>
-                        </div>
-
-                    </form>
-                </section>
-
-                <footer class="dashboard-footer">
-                    Meu Controle Financeiro © ${new Date().getFullYear()}
-                </footer>
-
-            </main>
+      <div class="sidebar-logo">
+        <div class="logo-icon">M</div>
+        <div>
+          <h2>Meu Controle</h2>
+          <span>Financeiro</span>
         </div>
+      </div>
+
+      <nav class="sidebar-menu">
+        <span class="menu-titulo">MENU PRINCIPAL</span>
+
+        <a href="#dashboard" class="menu-link ativo">
+          <span>▦</span>
+          Dashboard
+        </a>
+
+        <a href="#movimentacoes" class="menu-link">
+          <span>↔</span>
+          Movimentações
+        </a>
+
+        <a href="#investimentos" class="menu-link">
+          <span>📈</span>
+          Investimentos
+        </a>
+
+        <a href="#receitas" class="menu-link">
+          <span>＋</span>
+          Nova movimentação
+        </a>
+      </nav>
+
+      <div class="sidebar-rodape">
+        <div class="usuario-avatar" id="avatar-usuario">U</div>
+
+        <div class="usuario-info">
+          <strong id="nome-sidebar"></strong>
+          <span>Minha conta</span>
+        </div>
+
+        <button type="button" id="btn-sair" title="Sair">
+          ↪
+        </button>
+      </div>
+
+    </aside>
+
+    <div class="dashboard-conteudo">
+
+      <header class="topbar">
+        <div>
+          <h1>Dashboard</h1>
+          <p>Bem-vindo ao seu controle financeiro!</p>
+        </div>
+
+        <div class="topbar-usuario">
+          <span>Olá, <strong id="nome-usuario"></strong> 👋</span>
+        </div>
+      </header>
+
+      <main class="dashboard-main" id="dashboard">
+
+        <section class="secao-boas-vindas">
+          <div>
+            <span class="texto-destaque">VISÃO GERAL</span>
+            <h2>Suas finanças em um só lugar.</h2>
+            <p>Acompanhe suas receitas, despesas, investimentos e saldo.</p>
+          </div>
+
+          <button type="button" id="btn-nova-movimentacao">
+            + Nova movimentação
+          </button>
+        </section>
+
+        <!-- RESUMO FINANCEIRO -->
+
+        <section id="resumo" class="secao-resumo">
+
+          <div class="card-resumo receita-card">
+            <div class="card-resumo-topo">
+              <span>Receitas</span>
+              <span class="card-icone">↗</span>
+            </div>
+            <h2 id="total-receitas">R$ 0,00</h2>
+            <p>Total de entradas</p>
+          </div>
+
+          <div class="card-resumo despesa-card">
+            <div class="card-resumo-topo">
+              <span>Despesas</span>
+              <span class="card-icone">↘</span>
+            </div>
+            <h2 id="total-despesas">R$ 0,00</h2>
+            <p>Total de saídas</p>
+          </div>
+
+          <div class="card-resumo saldo-card">
+            <div class="card-resumo-topo">
+              <span>Saldo disponível</span>
+              <span class="card-icone">R$</span>
+            </div>
+            <h2 id="saldo-total">R$ 0,00</h2>
+            <p>Receitas menos despesas</p>
+          </div>
+
+          <div class="card-resumo investimento-card">
+            <div class="card-resumo-topo">
+              <span>Total investido</span>
+              <span class="card-icone">📈</span>
+            </div>
+            <h2 id="total-investido">R$ 0,00</h2>
+            <p>Dinheiro aplicado</p>
+          </div>
+
+        </section>
+
+        <!-- RELATÓRIOS -->
+
+        <section class="secao-relatorios">
+          <div class="secao-titulo">
+            <div>
+              <h2>Relatórios</h2>
+              <p>Filtre suas movimentações e salve o resultado em PDF.</p>
+            </div>
+          </div>
+
+          <div class="relatorio-controles">
+
+            <div class="campo">
+              <label for="periodo-relatorio">Período</label>
+              <select id="periodo-relatorio">
+                <option value="mensal">Mensal</option>
+                <option value="semanal">Semanal</option>
+                <option value="personalizado">Personalizado</option>
+              </select>
+            </div>
+
+            <div class="campo campo-data-relatorio">
+              <label for="data-relatorio">Data de referência</label>
+              <input type="date" id="data-relatorio">
+            </div>
+
+            <div class="campo intervalo-relatorio" hidden>
+              <label for="inicio-relatorio">De</label>
+              <input type="date" id="inicio-relatorio">
+            </div>
+
+            <div class="campo intervalo-relatorio" hidden>
+              <label for="fim-relatorio">Até</label>
+              <input type="date" id="fim-relatorio">
+            </div>
+
+            <button type="button" id="btn-baixar-relatorio">
+              Baixar relatório em PDF
+            </button>
+
+          </div>
+        </section>
+
+        <!-- INVESTIMENTOS -->
+
+        <section id="investimentos" class="secao-investimentos">
+
+          <div class="secao-titulo">
+            <div>
+              <h2>Meus investimentos</h2>
+              <p>Registre onde você investiu, o valor e a data da aplicação.</p>
+            </div>
+          </div>
+
+          <form id="form-investimentos" class="investimento-controles">
+
+            <div class="campo">
+              <label for="valor-investido">Valor investido (R$)</label>
+              <input
+                type="number"
+                id="valor-investido"
+                min="0.01"
+                step="0.01"
+                placeholder="Ex.: 500,00"
+                required
+              >
+            </div>
+
+            <div class="campo">
+              <label for="local-investimento">Onde você investiu?</label>
+              <input
+                type="text"
+                id="local-investimento"
+                maxlength="150"
+                placeholder="Ex.: Nubank, CDB, Tesouro Direto..."
+                required
+              >
+            </div>
+
+            <div class="campo">
+              <label for="data-investimento">Data do investimento</label>
+              <input
+                type="date"
+                id="data-investimento"
+                required
+              >
+            </div>
+
+            <div class="botoes-formulario">
+              <button type="submit" id="btn-salvar-investimento">
+                Cadastrar investimento
+              </button>
+
+              <button
+                type="button"
+                id="btn-cancelar-investimento"
+                style="display: none;"
+              >
+                Cancelar edição
+              </button>
+            </div>
+
+            <span id="status-investimento" role="status"></span>
+
+          </form>
+
+          <div class="secao-titulo">
+            <div>
+              <h2>Histórico de investimentos</h2>
+              <p>Consulte, edite ou exclua seus investimentos cadastrados.</p>
+            </div>
+          </div>
+
+          <div id="lista-investimentos">
+            <p>Carregando investimentos...</p>
+          </div>
+
+        </section>
+
+        <!-- GRÁFICO -->
+
+        <section class="secao-grafico">
+          <div class="secao-titulo">
+            <div>
+              <h2>Visão financeira</h2>
+              <p>Receitas e despesas dos últimos meses</p>
+            </div>
+          </div>
+
+          <div id="grafico-mensal" class="grafico-mensal">
+            <p>Carregando gráfico...</p>
+          </div>
+        </section>
+
+        <!-- MOVIMENTAÇÕES -->
+
+        <section id="movimentacoes" class="secao-movimentacoes">
+          <div class="secao-titulo">
+            <div>
+              <h2>Movimentações recentes</h2>
+              <p>Acompanhe seus últimos lançamentos.</p>
+            </div>
+          </div>
+
+          <div id="lista-movimentacoes">
+            <p>Carregando movimentações...</p>
+          </div>
+        </section>
+
+        <!-- FORMULÁRIO DE MOVIMENTAÇÃO -->
+
+        <section id="receitas" class="secao-formulario">
+
+          <div class="secao-titulo">
+            <div>
+              <h2 id="titulo-formulario">Nova movimentação</h2>
+              <p>Registre suas receitas e despesas.</p>
+            </div>
+          </div>
+
+          <form id="form-movimentacao">
+
+            <div class="campo">
+              <label for="descricao">Descrição</label>
+              <input
+                type="text"
+                id="descricao"
+                placeholder="Ex.: Salário, aluguel..."
+                required
+              >
+            </div>
+
+            <div class="campo">
+              <label for="valor">Valor (R$)</label>
+              <input
+                type="number"
+                id="valor"
+                placeholder="0,00"
+                step="0.01"
+                min="0.01"
+                required
+              >
+            </div>
+
+            <div class="campo">
+              <label for="tipo">Tipo</label>
+              <select id="tipo" required>
+                <option value="">Selecione</option>
+                <option value="receita">Receita</option>
+                <option value="despesa">Despesa</option>
+              </select>
+            </div>
+
+            <div class="campo">
+              <label for="categoria">Categoria</label>
+              <select id="categoria" required>
+                <option value="">Selecione uma categoria</option>
+              </select>
+
+              <div class="adicionar-categoria">
+                <input
+                  type="text"
+                  id="nova-categoria"
+                  maxlength="60"
+                  placeholder="Nome da nova categoria"
+                  aria-label="Nome da nova categoria"
+                >
+
+                <button type="button" id="btn-adicionar-categoria">
+                  Adicionar
+                </button>
+              </div>
+
+              <small id="status-categoria" role="status">
+                Escolha o tipo da movimentação para ver as categorias.
+              </small>
+            </div>
+
+            <div class="campo">
+              <label for="data">Data da movimentação</label>
+              <input type="date" id="data" required>
+            </div>
+
+            <div class="botoes-formulario">
+              <button type="submit" id="btn-salvar">
+                Cadastrar movimentação
+              </button>
+
+              <button
+                type="button"
+                id="btn-cancelar"
+                style="display: none;"
+              >
+                Cancelar edição
+              </button>
+            </div>
+
+          </form>
+        </section>
+
+        <footer class="dashboard-footer">
+          Meu Controle Financeiro © ${new Date().getFullYear()}
+        </footer>
+
+      </main>
     </div>
+  </div>
 `;
 
 // ========================================
-// 4. ELEMENTOS
+// 4. ELEMENTOS E FUNÇÕES GERAIS
 // ========================================
 
 const formulario = document.querySelector("#form-movimentacao");
@@ -275,11 +433,31 @@ const botaoSalvar = document.querySelector("#btn-salvar");
 const botaoCancelar = document.querySelector("#btn-cancelar");
 const tituloFormulario = document.querySelector("#titulo-formulario");
 
+const formularioInvestimentos = document.querySelector("#form-investimentos");
+const botaoSalvarInvestimento = document.querySelector("#btn-salvar-investimento");
+const botaoCancelarInvestimento = document.querySelector("#btn-cancelar-investimento");
+
 const formatarMoeda = (valor) =>
   Number(valor || 0).toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL",
   });
+
+function obterDataHoje() {
+  const hoje = new Date();
+
+  return `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, "0")}-${String(hoje.getDate()).padStart(2, "0")}`;
+}
+
+async function lerRespostaApi(resposta) {
+  const tipoConteudo = resposta.headers.get("content-type") || "";
+
+  if (!tipoConteudo.includes("application/json")) {
+    throw new Error("A API não reconheceu esta rota. Verifique o backend e tente novamente.");
+  }
+
+  return resposta.json();
+}
 
 // ========================================
 // 5. MOSTRAR USUÁRIO
@@ -287,6 +465,7 @@ const formatarMoeda = (valor) =>
 
 document.querySelector("#nome-usuario").textContent = usuario.nome;
 document.querySelector("#nome-sidebar").textContent = usuario.nome;
+
 document.querySelector("#avatar-usuario").textContent = usuario.nome.charAt(0).toUpperCase();
 
 // ========================================
@@ -317,7 +496,7 @@ document.querySelector("#btn-sair").addEventListener("click", async () => {
 });
 
 // ========================================
-// 7. NAVEGAÇÃO DO MENU
+// 7. NAVEGAÇÃO
 // ========================================
 
 document.querySelectorAll(".menu-link").forEach((link) => {
@@ -337,7 +516,114 @@ document.querySelector("#btn-nova-movimentacao").addEventListener("click", () =>
 });
 
 // ========================================
-// 8. FORMATAR DATA
+// 8. CATEGORIAS
+// ========================================
+
+const categoriaSelect = document.querySelector("#categoria");
+const tipoSelect = document.querySelector("#tipo");
+
+function atualizarOpcoesCategoria(valorSelecionado = "") {
+  const tipo = tipoSelect.value;
+
+  const nomesPadrao =
+    tipo === "receita"
+      ? ["Salário", "Renda extra", "Outros"]
+      : ["Alimentação", "Moradia", "Transporte", "Saúde", "Educação", "Lazer", "Contas", "Outros"];
+
+  const nomes = [
+    ...nomesPadrao,
+    ...categorias
+      .filter((item) => item.tipo === tipo || item.tipo === "ambos")
+      .map((item) => item.nome),
+  ];
+
+  const nomesUnicos = [...new Set(nomes)];
+
+  categoriaSelect.innerHTML = '<option value="">Selecione uma categoria</option>';
+
+  nomesUnicos.forEach((nome) => {
+    const option = document.createElement("option");
+    option.value = nome;
+    option.textContent = nome;
+    categoriaSelect.appendChild(option);
+  });
+
+  if (valorSelecionado && !nomesUnicos.includes(valorSelecionado)) {
+    const option = document.createElement("option");
+    option.value = valorSelecionado;
+    option.textContent = valorSelecionado;
+    categoriaSelect.appendChild(option);
+  }
+
+  categoriaSelect.value = valorSelecionado;
+
+  document.querySelector("#status-categoria").textContent = tipo
+    ? "Você também pode adicionar suas próprias categorias."
+    : "Escolha o tipo da movimentação para ver as categorias.";
+}
+
+tipoSelect.addEventListener("change", () => atualizarOpcoesCategoria());
+
+async function carregarCategorias() {
+  try {
+    const resposta = await fetch(`${API}/categorias`, {
+      credentials: "include",
+    });
+
+    if (!resposta.ok) {
+      throw new Error("Não foi possível carregar as categorias.");
+    }
+
+    categorias = await lerRespostaApi(resposta);
+    atualizarOpcoesCategoria(categoriaSelect.value);
+  } catch (erro) {
+    console.error("Erro ao carregar categorias:", erro);
+  }
+}
+
+document.querySelector("#btn-adicionar-categoria").addEventListener("click", async () => {
+  const nome = document.querySelector("#nova-categoria").value.trim();
+  const tipo = tipoSelect.value;
+  const status = document.querySelector("#status-categoria");
+
+  if (!tipo) {
+    status.textContent = "Selecione primeiro se a categoria será de receita ou despesa.";
+    return;
+  }
+
+  if (!nome) {
+    status.textContent = "Digite o nome da categoria.";
+    return;
+  }
+
+  try {
+    const resposta = await fetch(`${API}/categorias`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ nome, tipo }),
+    });
+
+    const resultado = await lerRespostaApi(resposta);
+
+    if (!resposta.ok) {
+      throw new Error(resultado.mensagem || "Não foi possível adicionar a categoria.");
+    }
+
+    categorias.push(resultado.categoria);
+    atualizarOpcoesCategoria(nome);
+
+    document.querySelector("#nova-categoria").value = "";
+    status.textContent = `Categoria "${nome}" adicionada.`;
+  } catch (erro) {
+    status.textContent = erro.message;
+  }
+});
+
+// ========================================
+// 9. FORMATAR DATA
 // ========================================
 
 function formatarData(data) {
@@ -354,7 +640,7 @@ function formatarData(data) {
 }
 
 // ========================================
-// 9. CARREGAR MOVIMENTAÇÕES
+// 10. CARREGAR MOVIMENTAÇÕES
 // ========================================
 
 async function carregarMovimentacoes() {
@@ -373,7 +659,7 @@ async function carregarMovimentacoes() {
       throw new Error("Não foi possível buscar as movimentações.");
     }
 
-    movimentacoes = await resposta.json();
+    movimentacoes = await lerRespostaApi(resposta);
 
     mostrarMovimentacoes();
     atualizarResumo();
@@ -389,7 +675,526 @@ async function carregarMovimentacoes() {
 }
 
 // ========================================
-// 10. MOSTRAR MOVIMENTAÇÕES
+// 11. CARREGAR INVESTIMENTOS
+// ========================================
+
+async function carregarInvestimentos() {
+  try {
+    const resposta = await fetch(`${API}/investimentos`, {
+      credentials: "include",
+    });
+
+    if (resposta.status === 401) {
+      localStorage.removeItem("usuario");
+      window.location.href = "/login.html";
+      return;
+    }
+
+    if (!resposta.ok) {
+      throw new Error("Não foi possível carregar os investimentos.");
+    }
+
+    const resultado = await lerRespostaApi(resposta);
+
+    investimentos = Array.isArray(resultado.investimentos) ? resultado.investimentos : [];
+
+    mostrarInvestimentos();
+    atualizarResumo();
+  } catch (erro) {
+    console.error("Erro ao carregar investimentos:", erro);
+
+    document.querySelector("#lista-investimentos").textContent =
+      "Não foi possível carregar o histórico de investimentos.";
+  }
+}
+
+// ========================================
+// 12. MOSTRAR HISTÓRICO DE INVESTIMENTOS
+// ========================================
+
+function mostrarInvestimentos() {
+  const lista = document.querySelector("#lista-investimentos");
+
+  lista.innerHTML = "";
+
+  if (investimentos.length === 0) {
+    lista.innerHTML = `
+      <div class="lista-vazia">
+        <span>📈</span>
+        <p>Nenhum investimento cadastrado.</p>
+        <small>Registre seu primeiro investimento acima.</small>
+      </div>
+    `;
+    return;
+  }
+
+  const recentes = [...investimentos].sort((a, b) =>
+    String(b.data_investimento).localeCompare(String(a.data_investimento)),
+  );
+
+  recentes.forEach((investimento) => {
+    const linha = document.createElement("div");
+    linha.className = "movimentacao-item investimento";
+
+    const informacoes = document.createElement("div");
+    informacoes.className = "movimentacao-info";
+
+    const local = document.createElement("strong");
+    local.textContent = investimento.local_investimento;
+
+    const detalhes = document.createElement("span");
+    detalhes.textContent = `Investimento • ${formatarData(investimento.data_investimento)}`;
+
+    informacoes.appendChild(local);
+    informacoes.appendChild(detalhes);
+
+    const valor = document.createElement("strong");
+    valor.className = "movimentacao-valor";
+    valor.textContent = formatarMoeda(investimento.valor);
+
+    const acoes = document.createElement("div");
+    acoes.className = "movimentacao-acoes";
+
+    const editar = document.createElement("button");
+    editar.type = "button";
+    editar.className = "btn-editar";
+    editar.textContent = "Editar";
+
+    editar.addEventListener("click", () => {
+      editarInvestimento(investimento.id);
+    });
+
+    const excluir = document.createElement("button");
+    excluir.type = "button";
+    excluir.className = "btn-excluir";
+    excluir.textContent = "Excluir";
+
+    excluir.addEventListener("click", () => {
+      excluirInvestimento(investimento.id);
+    });
+
+    acoes.appendChild(editar);
+    acoes.appendChild(excluir);
+
+    linha.appendChild(informacoes);
+    linha.appendChild(valor);
+    linha.appendChild(acoes);
+
+    lista.appendChild(linha);
+  });
+}
+
+// ========================================
+// 13. CADASTRAR OU ATUALIZAR INVESTIMENTO
+// ========================================
+
+formularioInvestimentos.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const valor = Number(document.querySelector("#valor-investido").value);
+  const local_investimento = document.querySelector("#local-investimento").value.trim();
+
+  const data_investimento = document.querySelector("#data-investimento").value;
+  const status = document.querySelector("#status-investimento");
+
+  if (!valor || valor <= 0 || !local_investimento || !data_investimento) {
+    status.textContent = "Preencha todos os campos corretamente.";
+    return;
+  }
+
+  const dados = {
+    valor,
+    local_investimento,
+    data_investimento,
+  };
+
+  const editando = idInvestimentoEmEdicao !== null;
+
+  const url = editando ? `${API}/investimentos/${idInvestimentoEmEdicao}` : `${API}/investimentos`;
+
+  const metodo = editando ? "PUT" : "POST";
+
+  try {
+    botaoSalvarInvestimento.disabled = true;
+
+    const resposta = await fetch(url, {
+      method: metodo,
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(dados),
+    });
+
+    const resultado = await lerRespostaApi(resposta);
+
+    if (resposta.status === 401) {
+      localStorage.removeItem("usuario");
+      window.location.href = "/login.html";
+      return;
+    }
+
+    if (!resposta.ok) {
+      throw new Error(resultado.mensagem || "Não foi possível salvar o investimento.");
+    }
+
+    cancelarEdicaoInvestimento();
+
+    status.textContent = editando
+      ? "Investimento atualizado com sucesso!"
+      : "Investimento cadastrado com sucesso!";
+
+    await carregarInvestimentos();
+  } catch (erro) {
+    console.error("Erro ao salvar investimento:", erro);
+    status.textContent = erro.message;
+  } finally {
+    botaoSalvarInvestimento.disabled = false;
+  }
+});
+
+// ========================================
+// 14. EDITAR INVESTIMENTO
+// ========================================
+
+function editarInvestimento(id) {
+  const investimento = investimentos.find((item) => Number(item.id) === Number(id));
+
+  if (!investimento) {
+    alert("Investimento não encontrado.");
+    return;
+  }
+
+  document.querySelector("#valor-investido").value = investimento.valor;
+
+  document.querySelector("#local-investimento").value = investimento.local_investimento;
+
+  document.querySelector("#data-investimento").value = String(investimento.data_investimento).slice(
+    0,
+    10,
+  );
+
+  idInvestimentoEmEdicao = investimento.id;
+
+  botaoSalvarInvestimento.textContent = "Salvar alterações";
+  botaoCancelarInvestimento.style.display = "inline-block";
+
+  document.querySelector("#status-investimento").textContent = "Editando investimento selecionado.";
+
+  document.querySelector("#investimentos").scrollIntoView({
+    behavior: "smooth",
+    block: "start",
+  });
+}
+
+// ========================================
+// 15. CANCELAR EDIÇÃO DE INVESTIMENTO
+// ========================================
+
+function cancelarEdicaoInvestimento() {
+  idInvestimentoEmEdicao = null;
+
+  formularioInvestimentos.reset();
+
+  botaoSalvarInvestimento.textContent = "Cadastrar investimento";
+  botaoCancelarInvestimento.style.display = "none";
+
+  document.querySelector("#status-investimento").textContent = "";
+}
+
+botaoCancelarInvestimento.addEventListener("click", cancelarEdicaoInvestimento);
+
+// ========================================
+// 16. EXCLUIR INVESTIMENTO
+// ========================================
+
+async function excluirInvestimento(id) {
+  const confirmar = confirm("Deseja realmente excluir este investimento?");
+
+  if (!confirmar) return;
+
+  try {
+    const resposta = await fetch(`${API}/investimentos/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+
+    const resultado = await lerRespostaApi(resposta);
+
+    if (resposta.status === 401) {
+      localStorage.removeItem("usuario");
+      window.location.href = "/login.html";
+      return;
+    }
+
+    if (!resposta.ok) {
+      throw new Error(resultado.mensagem || "Erro ao excluir investimento.");
+    }
+
+    if (Number(idInvestimentoEmEdicao) === Number(id)) {
+      cancelarEdicaoInvestimento();
+    }
+
+    await carregarInvestimentos();
+
+    alert("Investimento excluído com sucesso!");
+  } catch (erro) {
+    console.error("Erro ao excluir investimento:", erro);
+    alert(erro.message);
+  }
+}
+
+// ========================================
+// 17. RELATÓRIOS
+// ========================================
+
+function obterIntervaloRelatorio() {
+  const tipo = document.querySelector("#periodo-relatorio").value;
+
+  if (tipo === "personalizado") {
+    return {
+      inicio: document.querySelector("#inicio-relatorio").value,
+      fim: document.querySelector("#fim-relatorio").value,
+      titulo: "Período personalizado",
+    };
+  }
+
+  const referencia = document.querySelector("#data-relatorio").value || obterDataHoje();
+
+  const data = new Date(`${referencia}T12:00:00`);
+
+  const dataChave = (valor) =>
+    `${valor.getFullYear()}-${String(valor.getMonth() + 1).padStart(2, "0")}-${String(valor.getDate()).padStart(2, "0")}`;
+
+  if (tipo === "mensal") {
+    return {
+      inicio: `${referencia.slice(0, 7)}-01`,
+      fim: dataChave(new Date(data.getFullYear(), data.getMonth() + 1, 0)),
+      titulo: `Relatório mensal — ${data.toLocaleDateString("pt-BR", {
+        month: "long",
+        year: "numeric",
+      })}`,
+    };
+  }
+
+  const inicio = new Date(data);
+  inicio.setDate(data.getDate() - ((data.getDay() + 6) % 7));
+
+  const fim = new Date(inicio);
+  fim.setDate(inicio.getDate() + 6);
+
+  return {
+    inicio: dataChave(inicio),
+    fim: dataChave(fim),
+    titulo: `Relatório semanal — ${formatarData(dataChave(inicio))} a ${formatarData(dataChave(fim))}`,
+  };
+}
+
+document.querySelector("#data-relatorio").value = obterDataHoje();
+
+document.querySelector("#periodo-relatorio").addEventListener("change", (event) => {
+  const personalizado = event.target.value === "personalizado";
+
+  document.querySelector(".campo-data-relatorio").hidden = personalizado;
+
+  document.querySelectorAll(".intervalo-relatorio").forEach((campo) => {
+    campo.hidden = !personalizado;
+  });
+});
+
+document.querySelector("#btn-baixar-relatorio").addEventListener("click", () => {
+  const intervalo = obterIntervaloRelatorio();
+
+  if (!intervalo.inicio || !intervalo.fim || intervalo.inicio > intervalo.fim) {
+    alert("Informe um período válido.");
+    return;
+  }
+
+  const itens = movimentacoes
+    .filter(
+      (item) =>
+        String(item.data).slice(0, 10) >= intervalo.inicio &&
+        String(item.data).slice(0, 10) <= intervalo.fim,
+    )
+    .sort((a, b) => String(a.data).localeCompare(String(b.data)));
+
+  const investimentosPeriodo = investimentos
+    .filter(
+      (item) =>
+        String(item.data_investimento).slice(0, 10) >= intervalo.inicio &&
+        String(item.data_investimento).slice(0, 10) <= intervalo.fim,
+    )
+    .sort((a, b) => String(a.data_investimento).localeCompare(String(b.data_investimento)));
+
+  const totais = itens.reduce(
+    (acc, item) => {
+      acc[item.tipo] += Number(item.valor);
+      return acc;
+    },
+    { receita: 0, despesa: 0 },
+  );
+
+  const totalInvestimentos = investimentosPeriodo.reduce(
+    (total, item) => total + Number(item.valor),
+    0,
+  );
+
+  // O saldo do relatório também não desconta os investimentos.
+  const saldoPeriodo = totais.receita - totais.despesa;
+
+  const linhasMovimentacoes = itens
+    .map(
+      (item) => `
+    <tr>
+      <td>${formatarData(item.data)}</td>
+      <td>${escapeHtml(item.descricao)}</td>
+      <td>${escapeHtml(item.categoria || "Outros")}</td>
+      <td>${item.tipo === "receita" ? "Receita" : "Despesa"}</td>
+      <td>${formatarMoeda(item.valor)}</td>
+    </tr>
+  `,
+    )
+    .join("");
+
+  const linhasInvestimentos = investimentosPeriodo
+    .map(
+      (item) => `
+    <tr>
+      <td>${formatarData(item.data_investimento)}</td>
+      <td>${escapeHtml(item.local_investimento)}</td>
+      <td>Investimento</td>
+      <td>Aplicação</td>
+      <td>${formatarMoeda(item.valor)}</td>
+    </tr>
+  `,
+    )
+    .join("");
+
+  const janela = window.open("", "_blank");
+
+  if (!janela) {
+    alert("Permita a abertura da janela para gerar o PDF.");
+    return;
+  }
+
+  janela.document.write(`
+    <!doctype html>
+    <html lang="pt-BR">
+    <head>
+      <meta charset="utf-8">
+      <title>${escapeHtml(intervalo.titulo)}</title>
+
+      <style>
+        body {
+          font: 14px Arial;
+          color: #26352a;
+          padding: 32px;
+        }
+
+        h1 {
+          color: #1b5e20;
+        }
+
+        p {
+          color: #526354;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 24px;
+        }
+
+        th, td {
+          text-align: left;
+          padding: 10px;
+          border-bottom: 1px solid #dce5dd;
+        }
+
+        th {
+          background: #edf5ee;
+        }
+
+        .totais {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 20px;
+          margin-top: 20px;
+          font-weight: bold;
+        }
+
+        @media print {
+          body {
+            padding: 0;
+          }
+        }
+      </style>
+    </head>
+
+    <body>
+      <h1>Meu Controle Financeiro</h1>
+      <h2>${escapeHtml(intervalo.titulo)}</h2>
+
+      <p>
+        ${formatarData(intervalo.inicio)} a ${formatarData(intervalo.fim)}
+      </p>
+
+      <div class="totais">
+        <span>Receitas: ${formatarMoeda(totais.receita)}</span>
+        <span>Despesas: ${formatarMoeda(totais.despesa)}</span>
+        <span>Investimentos: ${formatarMoeda(totalInvestimentos)}</span>
+        <span>Saldo disponível: ${formatarMoeda(saldoPeriodo)}</span>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Descrição / Local</th>
+            <th>Categoria</th>
+            <th>Tipo</th>
+            <th>Valor</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          ${
+            linhasMovimentacoes + linhasInvestimentos ||
+            '<tr><td colspan="5">Nenhum registro no período.</td></tr>'
+          }
+        </tbody>
+      </table>
+
+      <script>
+        window.onload = () => window.print();
+      </script>
+    </body>
+    </html>
+  `);
+
+  janela.document.close();
+});
+
+// ========================================
+// 18. PROTEGER TEXTO HTML
+// ========================================
+
+function escapeHtml(texto) {
+  return String(texto).replace(
+    /[&<>"']/g,
+    (caractere) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      })[caractere],
+  );
+}
+
+// ========================================
+// 19. MOSTRAR MOVIMENTAÇÕES
 // ========================================
 
 function mostrarMovimentacoes() {
@@ -399,12 +1204,12 @@ function mostrarMovimentacoes() {
 
   if (movimentacoes.length === 0) {
     lista.innerHTML = `
-            <div class="lista-vazia">
-                <span>📋</span>
-                <p>Nenhuma movimentação cadastrada.</p>
-                <small>Comece registrando sua primeira receita ou despesa.</small>
-            </div>
-        `;
+      <div class="lista-vazia">
+        <span>📋</span>
+        <p>Nenhuma movimentação cadastrada.</p>
+        <small>Comece registrando sua primeira receita ou despesa.</small>
+      </div>
+    `;
     return;
   }
 
@@ -428,6 +1233,7 @@ function mostrarMovimentacoes() {
 
     const valor = document.createElement("strong");
     valor.className = "movimentacao-valor";
+
     valor.textContent = `${movimentacao.tipo === "receita" ? "+" : "-"} ${formatarMoeda(movimentacao.valor)}`;
 
     const acoes = document.createElement("div");
@@ -437,6 +1243,7 @@ function mostrarMovimentacoes() {
     editar.type = "button";
     editar.className = "btn-editar";
     editar.textContent = "Editar";
+
     editar.addEventListener("click", () => {
       editarMovimentacao(movimentacao.id);
     });
@@ -445,6 +1252,7 @@ function mostrarMovimentacoes() {
     excluir.type = "button";
     excluir.className = "btn-excluir";
     excluir.textContent = "Excluir";
+
     excluir.addEventListener("click", () => {
       excluirMovimentacao(movimentacao.id);
     });
@@ -461,15 +1269,17 @@ function mostrarMovimentacoes() {
 }
 
 // ========================================
-// 11. ATUALIZAR RESUMO
+// 20. ATUALIZAR RESUMO FINANCEIRO
 // ========================================
 
 function atualizarResumo() {
   let totalReceitas = 0;
   let totalDespesas = 0;
+  let totalInvestido = 0;
 
+  // Somar somente as receitas e despesas.
   movimentacoes.forEach((movimentacao) => {
-    const valor = Number(movimentacao.valor);
+    const valor = Number(movimentacao.valor) || 0;
 
     if (movimentacao.tipo === "receita") {
       totalReceitas += valor;
@@ -480,27 +1290,38 @@ function atualizarResumo() {
     }
   });
 
+  // Somar investimentos separadamente.
+  investimentos.forEach((investimento) => {
+    totalInvestido += Number(investimento.valor) || 0;
+  });
+
+  // Saldo disponível: receitas menos despesas.
+  // Os investimentos NÃO são descontados.
   const saldo = totalReceitas - totalDespesas;
 
   document.querySelector("#total-receitas").textContent = formatarMoeda(totalReceitas);
 
   document.querySelector("#total-despesas").textContent = formatarMoeda(totalDespesas);
 
+  document.querySelector("#total-investido").textContent = formatarMoeda(totalInvestido);
+
   document.querySelector("#saldo-total").textContent = formatarMoeda(saldo);
 }
 
 // ========================================
-// 12. GRÁFICO DOS ÚLTIMOS 6 MESES
+// 21. GRÁFICO DOS ÚLTIMOS 6 MESES
 // ========================================
 
 function atualizarGrafico() {
   const grafico = document.querySelector("#grafico-mensal");
+
   grafico.innerHTML = "";
 
   const meses = [];
 
   for (let i = 5; i >= 0; i--) {
     const data = new Date();
+
     data.setDate(1);
     data.setMonth(data.getMonth() - i);
 
@@ -533,10 +1354,11 @@ function atualizarGrafico() {
 
   const legenda = document.createElement("div");
   legenda.className = "grafico-legenda";
+
   legenda.innerHTML = `
-        <span><i class="legenda-receita"></i> Receitas</span>
-        <span><i class="legenda-despesa"></i> Despesas</span>
-    `;
+    <span><i class="legenda-receita"></i> Receitas</span>
+    <span><i class="legenda-despesa"></i> Despesas</span>
+  `;
 
   grafico.appendChild(legenda);
 
@@ -580,7 +1402,7 @@ function atualizarGrafico() {
 }
 
 // ========================================
-// 13. EDITAR MOVIMENTAÇÃO
+// 22. EDITAR MOVIMENTAÇÃO
 // ========================================
 
 function editarMovimentacao(id) {
@@ -594,7 +1416,8 @@ function editarMovimentacao(id) {
   document.querySelector("#descricao").value = movimentacao.descricao;
   document.querySelector("#valor").value = movimentacao.valor;
   document.querySelector("#tipo").value = movimentacao.tipo;
-  document.querySelector("#categoria").value = movimentacao.categoria;
+
+  atualizarOpcoesCategoria(movimentacao.categoria);
 
   document.querySelector("#data").value = String(movimentacao.data).slice(0, 10);
 
@@ -611,7 +1434,7 @@ function editarMovimentacao(id) {
 }
 
 // ========================================
-// 14. CANCELAR EDIÇÃO
+// 23. CANCELAR EDIÇÃO DE MOVIMENTAÇÃO
 // ========================================
 
 function cancelarEdicao() {
@@ -622,12 +1445,14 @@ function cancelarEdicao() {
   tituloFormulario.textContent = "Nova movimentação";
   botaoSalvar.textContent = "Cadastrar movimentação";
   botaoCancelar.style.display = "none";
+
+  atualizarOpcoesCategoria();
 }
 
 botaoCancelar.addEventListener("click", cancelarEdicao);
 
 // ========================================
-// 15. EXCLUIR MOVIMENTAÇÃO
+// 24. EXCLUIR MOVIMENTAÇÃO
 // ========================================
 
 async function excluirMovimentacao(id) {
@@ -641,7 +1466,7 @@ async function excluirMovimentacao(id) {
       credentials: "include",
     });
 
-    const resultado = await resposta.json();
+    const resultado = await lerRespostaApi(resposta);
 
     if (resposta.status === 401) {
       localStorage.removeItem("usuario");
@@ -657,9 +1482,9 @@ async function excluirMovimentacao(id) {
       cancelarEdicao();
     }
 
-    alert("Movimentação excluída com sucesso!");
-
     await carregarMovimentacoes();
+
+    alert("Movimentação excluída com sucesso!");
   } catch (erro) {
     console.error("Erro ao excluir:", erro);
     alert(erro.message);
@@ -667,7 +1492,7 @@ async function excluirMovimentacao(id) {
 }
 
 // ========================================
-// 16. CADASTRAR OU ATUALIZAR
+// 25. CADASTRAR OU ATUALIZAR MOVIMENTAÇÃO
 // ========================================
 
 formulario.addEventListener("submit", async (event) => {
@@ -708,7 +1533,7 @@ formulario.addEventListener("submit", async (event) => {
       body: JSON.stringify(movimentacao),
     });
 
-    const resultado = await resposta.json();
+    const resultado = await lerRespostaApi(resposta);
 
     if (resposta.status === 401) {
       localStorage.removeItem("usuario");
@@ -725,6 +1550,7 @@ formulario.addEventListener("submit", async (event) => {
     );
 
     cancelarEdicao();
+
     await carregarMovimentacoes();
   } catch (erro) {
     console.error("Erro ao salvar movimentação:", erro);
@@ -733,7 +1559,12 @@ formulario.addEventListener("submit", async (event) => {
 });
 
 // ========================================
-// 17. INICIAR A APLICAÇÃO
+// 26. INICIAR A APLICAÇÃO
 // ========================================
 
+document.querySelector("#data-investimento").value = obterDataHoje();
+document.querySelector("#data").value = obterDataHoje();
+
 carregarMovimentacoes();
+carregarInvestimentos();
+carregarCategorias();
