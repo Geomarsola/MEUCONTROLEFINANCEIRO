@@ -12,7 +12,7 @@ const API = "http://localhost:3000/api";
 console.log("MEU CONTROLE FINANCEIRO INICIADO!");
 
 // ========================================
-// 2. VERIFICAR SESSÃO NO SERVIDOR
+// 2. VERIFICAR SESSÃO
 // ========================================
 
 let usuario;
@@ -30,7 +30,6 @@ try {
   }
 
   const resultado = await resposta.json();
-
   usuario = resultado.usuario;
 
   if (!usuario || !usuario.id || !usuario.nome) {
@@ -40,140 +39,258 @@ try {
   localStorage.setItem("usuario", JSON.stringify(usuario));
 } catch (erro) {
   console.error("Erro ao verificar sessão:", erro);
-
   localStorage.removeItem("usuario");
   window.location.href = "/login.html";
-
   throw erro;
 }
 
 // ========================================
-// 3. ESTRUTURA HTML
+// 3. ESTRUTURA DO DASHBOARD
 // ========================================
 
 const app = document.querySelector("#app");
 
 app.innerHTML = `
-    <header>
-        <h1>Meu Controle Financeiro</h1>
-        <p>Organize suas finanças em um só lugar.</p>
+    <div class="dashboard-layout">
 
-        <div class="usuario-logado">
-            <p>Olá, <strong id="nome-usuario"></strong>! 👋</p>
-            <button type="button" id="btn-sair">Sair</button>
+        <aside class="sidebar">
+
+            <div class="sidebar-logo">
+                <div class="logo-icon">M</div>
+                <div>
+                    <h2>Meu Controle</h2>
+                    <span>Financeiro</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <span class="menu-titulo">MENU PRINCIPAL</span>
+
+                <a href="#dashboard" class="menu-link ativo">
+                    <span>▦</span>
+                    Dashboard
+                </a>
+
+                <a href="#movimentacoes" class="menu-link">
+                    <span>↔</span>
+                    Movimentações
+                </a>
+
+                <a href="#receitas" class="menu-link">
+                    <span>＋</span>
+                    Nova movimentação
+                </a>
+            </nav>
+
+            <div class="sidebar-rodape">
+                <div class="usuario-avatar" id="avatar-usuario">U</div>
+
+                <div class="usuario-info">
+                    <strong id="nome-sidebar"></strong>
+                    <span>Minha conta</span>
+                </div>
+
+                <button type="button" id="btn-sair" title="Sair">
+                    ↪
+                </button>
+            </div>
+
+        </aside>
+
+        <div class="dashboard-conteudo">
+
+            <header class="topbar">
+                <div>
+                    <h1>Dashboard</h1>
+                    <p>Bem-vindo ao seu controle financeiro!</p>
+                </div>
+
+                <div class="topbar-usuario">
+                    <span>Olá, <strong id="nome-usuario"></strong> 👋</span>
+                </div>
+            </header>
+
+            <main class="dashboard-main" id="dashboard">
+
+                <section class="secao-boas-vindas">
+                    <div>
+                        <span class="texto-destaque">VISÃO GERAL</span>
+                        <h2>Suas finanças em um só lugar.</h2>
+                        <p>Acompanhe suas receitas, despesas e seu saldo.</p>
+                    </div>
+
+                    <button type="button" id="btn-nova-movimentacao">
+                        + Nova movimentação
+                    </button>
+                </section>
+
+                <section id="resumo" class="secao-resumo">
+
+                    <div class="card-resumo receita-card">
+                        <div class="card-resumo-topo">
+                            <span>Receitas</span>
+                            <span class="card-icone">↗</span>
+                        </div>
+                        <h2 id="total-receitas">R$ 0,00</h2>
+                        <p>Total de entradas</p>
+                    </div>
+
+                    <div class="card-resumo despesa-card">
+                        <div class="card-resumo-topo">
+                            <span>Despesas</span>
+                            <span class="card-icone">↘</span>
+                        </div>
+                        <h2 id="total-despesas">R$ 0,00</h2>
+                        <p>Total de saídas</p>
+                    </div>
+
+                    <div class="card-resumo saldo-card">
+                        <div class="card-resumo-topo">
+                            <span>Saldo disponível</span>
+                            <span class="card-icone">R$</span>
+                        </div>
+                        <h2 id="saldo-total">R$ 0,00</h2>
+                        <p>Receitas menos despesas</p>
+                    </div>
+
+                </section>
+
+                <section class="secao-grafico">
+                    <div class="secao-titulo">
+                        <div>
+                            <h2>Visão financeira</h2>
+                            <p>Receitas e despesas dos últimos meses</p>
+                        </div>
+                    </div>
+
+                    <div id="grafico-mensal" class="grafico-mensal">
+                        <p>Carregando gráfico...</p>
+                    </div>
+                </section>
+
+                <section id="movimentacoes" class="secao-movimentacoes">
+                    <div class="secao-titulo">
+                        <div>
+                            <h2>Movimentações recentes</h2>
+                            <p>Acompanhe seus últimos lançamentos.</p>
+                        </div>
+                    </div>
+
+                    <div id="lista-movimentacoes">
+                        <p>Carregando movimentações...</p>
+                    </div>
+                </section>
+
+                <section id="receitas" class="secao-formulario">
+
+                    <div class="secao-titulo">
+                        <div>
+                            <h2 id="titulo-formulario">Nova movimentação</h2>
+                            <p>Registre suas receitas e despesas.</p>
+                        </div>
+                    </div>
+
+                    <form id="form-movimentacao">
+
+                        <div class="campo">
+                            <label for="descricao">Descrição</label>
+                            <input
+                                type="text"
+                                id="descricao"
+                                placeholder="Ex.: Salário, aluguel..."
+                                required
+                            >
+                        </div>
+
+                        <div class="campo">
+                            <label for="valor">Valor (R$)</label>
+                            <input
+                                type="number"
+                                id="valor"
+                                placeholder="0,00"
+                                step="0.01"
+                                min="0.01"
+                                required
+                            >
+                        </div>
+
+                        <div class="campo">
+                            <label for="tipo">Tipo</label>
+                            <select id="tipo" required>
+                                <option value="">Selecione</option>
+                                <option value="receita">Receita</option>
+                                <option value="despesa">Despesa</option>
+                            </select>
+                        </div>
+
+                        <div class="campo">
+                            <label for="categoria">Categoria</label>
+                            <select id="categoria" required>
+                                <option value="">Selecione uma categoria</option>
+                                <option value="salario">Salário</option>
+                                <option value="alimentacao">Alimentação</option>
+                                <option value="moradia">Moradia</option>
+                                <option value="transporte">Transporte</option>
+                                <option value="outros">Outros</option>
+                            </select>
+                        </div>
+
+                        <div class="campo">
+                            <label for="data">Data da movimentação</label>
+                            <input type="date" id="data" required>
+                        </div>
+
+                        <div class="botoes-formulario">
+                            <button type="submit" id="btn-salvar">
+                                Cadastrar movimentação
+                            </button>
+
+                            <button
+                                type="button"
+                                id="btn-cancelar"
+                                style="display: none;"
+                            >
+                                Cancelar edição
+                            </button>
+                        </div>
+
+                    </form>
+                </section>
+
+                <footer class="dashboard-footer">
+                    Meu Controle Financeiro © ${new Date().getFullYear()}
+                </footer>
+
+            </main>
         </div>
-    </header>
-
-    <main>
-
-        <section id="resumo">
-            <h2>Resumo financeiro</h2>
-
-            <div class="cards-resumo">
-                <div class="card">
-                    <h3>Receitas</h3>
-                    <p id="total-receitas">R$ 0,00</p>
-                </div>
-
-                <div class="card">
-                    <h3>Despesas</h3>
-                    <p id="total-despesas">R$ 0,00</p>
-                </div>
-
-                <div class="card">
-                    <h3>Saldo</h3>
-                    <p id="saldo-total">R$ 0,00</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="receitas">
-            <h2 id="titulo-formulario">Nova movimentação</h2>
-
-            <form id="form-movimentacao">
-
-                <div class="campo">
-                    <label for="descricao">Descrição</label>
-                    <input
-                        type="text"
-                        id="descricao"
-                        placeholder="Ex.: Salário, aluguel..."
-                        required
-                    >
-                </div>
-
-                <div class="campo">
-                    <label for="valor">Valor (R$)</label>
-                    <input
-                        type="number"
-                        id="valor"
-                        placeholder="0,00"
-                        step="0.01"
-                        min="0.01"
-                        required
-                    >
-                </div>
-
-                <div class="campo">
-                    <label for="tipo">Tipo</label>
-                    <select id="tipo" required>
-                        <option value="">Selecione</option>
-                        <option value="receita">Receita</option>
-                        <option value="despesa">Despesa</option>
-                    </select>
-                </div>
-
-                <div class="campo">
-                    <label for="categoria">Categoria</label>
-                    <select id="categoria" required>
-                        <option value="">Selecione uma categoria</option>
-                        <option value="salario">Salário</option>
-                        <option value="alimentacao">Alimentação</option>
-                        <option value="moradia">Moradia</option>
-                        <option value="transporte">Transporte</option>
-                        <option value="outros">Outros</option>
-                    </select>
-                </div>
-
-                <div class="campo">
-                    <label for="data">Data da movimentação</label>
-                    <input type="date" id="data" required>
-                </div>
-
-                <button type="submit" id="btn-salvar">
-                    Cadastrar movimentação
-                </button>
-
-                <button
-                    type="button"
-                    id="btn-cancelar"
-                    style="display: none;"
-                >
-                    Cancelar edição
-                </button>
-
-            </form>
-        </section>
-
-        <section id="movimentacoes">
-            <h2>Movimentações</h2>
-
-            <div id="lista-movimentacoes">
-                <p>Carregando movimentações...</p>
-            </div>
-        </section>
-
-    </main>
+    </div>
 `;
 
 // ========================================
-// 4. MOSTRAR NOME DO USUÁRIO
+// 4. ELEMENTOS
+// ========================================
+
+const formulario = document.querySelector("#form-movimentacao");
+const botaoSalvar = document.querySelector("#btn-salvar");
+const botaoCancelar = document.querySelector("#btn-cancelar");
+const tituloFormulario = document.querySelector("#titulo-formulario");
+
+const formatarMoeda = (valor) =>
+  Number(valor || 0).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+
+// ========================================
+// 5. MOSTRAR USUÁRIO
 // ========================================
 
 document.querySelector("#nome-usuario").textContent = usuario.nome;
+document.querySelector("#nome-sidebar").textContent = usuario.nome;
+document.querySelector("#avatar-usuario").textContent = usuario.nome.charAt(0).toUpperCase();
 
 // ========================================
-// 5. BOTÃO SAIR
+// 6. BOTÃO SAIR
 // ========================================
 
 document.querySelector("#btn-sair").addEventListener("click", async () => {
@@ -192,7 +309,6 @@ document.querySelector("#btn-sair").addEventListener("click", async () => {
     }
 
     localStorage.removeItem("usuario");
-
     window.location.href = "/login.html";
   } catch (erro) {
     console.error("Erro ao sair:", erro);
@@ -201,24 +317,33 @@ document.querySelector("#btn-sair").addEventListener("click", async () => {
 });
 
 // ========================================
-// 6. CAPTURAR ELEMENTOS
+// 7. NAVEGAÇÃO DO MENU
 // ========================================
 
-const formulario = document.querySelector("#form-movimentacao");
-const botaoSalvar = document.querySelector("#btn-salvar");
-const botaoCancelar = document.querySelector("#btn-cancelar");
-const tituloFormulario = document.querySelector("#titulo-formulario");
+document.querySelectorAll(".menu-link").forEach((link) => {
+  link.addEventListener("click", () => {
+    document.querySelectorAll(".menu-link").forEach((item) => {
+      item.classList.remove("ativo");
+    });
+
+    link.classList.add("ativo");
+  });
+});
+
+document.querySelector("#btn-nova-movimentacao").addEventListener("click", () => {
+  document.querySelector("#receitas").scrollIntoView({
+    behavior: "smooth",
+  });
+});
 
 // ========================================
-// 7. FORMATAR DATA
+// 8. FORMATAR DATA
 // ========================================
 
 function formatarData(data) {
   if (!data) return "Data não informada";
 
-  const dataTexto =
-    typeof data === "string" ? data.slice(0, 10) : new Date(data).toISOString().slice(0, 10);
-
+  const dataTexto = String(data).slice(0, 10);
   const partes = dataTexto.split("-");
 
   if (partes.length !== 3) return "Data inválida";
@@ -229,7 +354,7 @@ function formatarData(data) {
 }
 
 // ========================================
-// 8. CARREGAR MOVIMENTAÇÕES
+// 9. CARREGAR MOVIMENTAÇÕES
 // ========================================
 
 async function carregarMovimentacoes() {
@@ -252,16 +377,19 @@ async function carregarMovimentacoes() {
 
     mostrarMovimentacoes();
     atualizarResumo();
+    atualizarGrafico();
   } catch (erro) {
     console.error("Erro ao carregar movimentações:", erro);
 
-    document.querySelector("#lista-movimentacoes").innerHTML =
-      "<p>Erro ao carregar os dados. Verifique se o servidor está ligado.</p>";
+    document.querySelector("#lista-movimentacoes").textContent =
+      "Erro ao carregar os dados. Verifique se o servidor está ligado.";
+
+    document.querySelector("#grafico-mensal").textContent = "Não foi possível carregar o gráfico.";
   }
 }
 
 // ========================================
-// 9. MOSTRAR MOVIMENTAÇÕES
+// 10. MOSTRAR MOVIMENTAÇÕES
 // ========================================
 
 function mostrarMovimentacoes() {
@@ -270,68 +398,77 @@ function mostrarMovimentacoes() {
   lista.innerHTML = "";
 
   if (movimentacoes.length === 0) {
-    lista.innerHTML = "<p>Nenhuma movimentação cadastrada.</p>";
+    lista.innerHTML = `
+            <div class="lista-vazia">
+                <span>📋</span>
+                <p>Nenhuma movimentação cadastrada.</p>
+                <small>Comece registrando sua primeira receita ou despesa.</small>
+            </div>
+        `;
     return;
   }
 
-  movimentacoes.forEach(function (movimentacao) {
-    const card = document.createElement("div");
-    card.className = `card ${movimentacao.tipo}`;
+  const recentes = [...movimentacoes].sort((a, b) => String(b.data).localeCompare(String(a.data)));
 
-    const titulo = document.createElement("h3");
-    titulo.textContent = movimentacao.descricao;
+  recentes.forEach((movimentacao) => {
+    const linha = document.createElement("div");
+    linha.className = `movimentacao-item ${movimentacao.tipo}`;
 
-    const valor = document.createElement("p");
-    valor.textContent = `Valor: ${Number(movimentacao.valor).toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    })}`;
+    const informacoes = document.createElement("div");
+    informacoes.className = "movimentacao-info";
 
-    const tipo = document.createElement("p");
-    tipo.className = "tipo-movimentacao";
-    tipo.textContent = movimentacao.tipo === "receita" ? "Receita" : "Despesa";
+    const descricao = document.createElement("strong");
+    descricao.textContent = movimentacao.descricao;
 
-    const data = document.createElement("p");
-    data.textContent = `Data: ${formatarData(movimentacao.data)}`;
+    const detalhes = document.createElement("span");
+    detalhes.textContent = `${movimentacao.categoria || "Outros"} • ${formatarData(movimentacao.data)}`;
 
-    const botaoEditar = document.createElement("button");
-    botaoEditar.type = "button";
-    botaoEditar.className = "btn-editar";
-    botaoEditar.textContent = "Editar";
+    informacoes.appendChild(descricao);
+    informacoes.appendChild(detalhes);
 
-    botaoEditar.addEventListener("click", function () {
+    const valor = document.createElement("strong");
+    valor.className = "movimentacao-valor";
+    valor.textContent = `${movimentacao.tipo === "receita" ? "+" : "-"} ${formatarMoeda(movimentacao.valor)}`;
+
+    const acoes = document.createElement("div");
+    acoes.className = "movimentacao-acoes";
+
+    const editar = document.createElement("button");
+    editar.type = "button";
+    editar.className = "btn-editar";
+    editar.textContent = "Editar";
+    editar.addEventListener("click", () => {
       editarMovimentacao(movimentacao.id);
     });
 
-    const botaoExcluir = document.createElement("button");
-    botaoExcluir.type = "button";
-    botaoExcluir.className = "btn-excluir";
-    botaoExcluir.textContent = "Excluir";
-
-    botaoExcluir.addEventListener("click", function () {
+    const excluir = document.createElement("button");
+    excluir.type = "button";
+    excluir.className = "btn-excluir";
+    excluir.textContent = "Excluir";
+    excluir.addEventListener("click", () => {
       excluirMovimentacao(movimentacao.id);
     });
 
-    card.appendChild(titulo);
-    card.appendChild(valor);
-    card.appendChild(tipo);
-    card.appendChild(data);
-    card.appendChild(botaoEditar);
-    card.appendChild(botaoExcluir);
+    acoes.appendChild(editar);
+    acoes.appendChild(excluir);
 
-    lista.appendChild(card);
+    linha.appendChild(informacoes);
+    linha.appendChild(valor);
+    linha.appendChild(acoes);
+
+    lista.appendChild(linha);
   });
 }
 
 // ========================================
-// 10. ATUALIZAR RESUMO
+// 11. ATUALIZAR RESUMO
 // ========================================
 
 function atualizarResumo() {
   let totalReceitas = 0;
   let totalDespesas = 0;
 
-  movimentacoes.forEach(function (movimentacao) {
+  movimentacoes.forEach((movimentacao) => {
     const valor = Number(movimentacao.valor);
 
     if (movimentacao.tipo === "receita") {
@@ -345,30 +482,109 @@ function atualizarResumo() {
 
   const saldo = totalReceitas - totalDespesas;
 
-  document.querySelector("#total-receitas").textContent = totalReceitas.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  });
+  document.querySelector("#total-receitas").textContent = formatarMoeda(totalReceitas);
 
-  document.querySelector("#total-despesas").textContent = totalDespesas.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  });
+  document.querySelector("#total-despesas").textContent = formatarMoeda(totalDespesas);
 
-  document.querySelector("#saldo-total").textContent = saldo.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  });
+  document.querySelector("#saldo-total").textContent = formatarMoeda(saldo);
 }
 
 // ========================================
-// 11. EDITAR MOVIMENTAÇÃO
+// 12. GRÁFICO DOS ÚLTIMOS 6 MESES
+// ========================================
+
+function atualizarGrafico() {
+  const grafico = document.querySelector("#grafico-mensal");
+  grafico.innerHTML = "";
+
+  const meses = [];
+
+  for (let i = 5; i >= 0; i--) {
+    const data = new Date();
+    data.setDate(1);
+    data.setMonth(data.getMonth() - i);
+
+    meses.push({
+      ano: data.getFullYear(),
+      mes: data.getMonth(),
+      nome: data.toLocaleDateString("pt-BR", { month: "short" }),
+      receitas: 0,
+      despesas: 0,
+    });
+  }
+
+  movimentacoes.forEach((item) => {
+    const data = new Date(`${String(item.data).slice(0, 10)}T12:00:00`);
+
+    const mesEncontrado = meses.find(
+      (mes) => mes.ano === data.getFullYear() && mes.mes === data.getMonth(),
+    );
+
+    if (!mesEncontrado) return;
+
+    if (item.tipo === "receita") {
+      mesEncontrado.receitas += Number(item.valor);
+    } else if (item.tipo === "despesa") {
+      mesEncontrado.despesas += Number(item.valor);
+    }
+  });
+
+  const maiorValor = Math.max(1, ...meses.flatMap((mes) => [mes.receitas, mes.despesas]));
+
+  const legenda = document.createElement("div");
+  legenda.className = "grafico-legenda";
+  legenda.innerHTML = `
+        <span><i class="legenda-receita"></i> Receitas</span>
+        <span><i class="legenda-despesa"></i> Despesas</span>
+    `;
+
+  grafico.appendChild(legenda);
+
+  const barras = document.createElement("div");
+  barras.className = "grafico-barras";
+
+  meses.forEach((mes) => {
+    const grupo = document.createElement("div");
+    grupo.className = "grafico-grupo";
+
+    const coluna = document.createElement("div");
+    coluna.className = "grafico-coluna";
+
+    const alturaReceita = (mes.receitas / maiorValor) * 100;
+    const alturaDespesa = (mes.despesas / maiorValor) * 100;
+
+    const barraReceita = document.createElement("div");
+    barraReceita.className = "barra receita";
+    barraReceita.style.height = `${Math.max(alturaReceita, 2)}%`;
+    barraReceita.title = `Receitas: ${formatarMoeda(mes.receitas)}`;
+
+    const barraDespesa = document.createElement("div");
+    barraDespesa.className = "barra despesa";
+    barraDespesa.style.height = `${Math.max(alturaDespesa, 2)}%`;
+    barraDespesa.title = `Despesas: ${formatarMoeda(mes.despesas)}`;
+
+    coluna.appendChild(barraReceita);
+    coluna.appendChild(barraDespesa);
+
+    const nomeMes = document.createElement("span");
+    nomeMes.className = "grafico-mes";
+    nomeMes.textContent = mes.nome;
+
+    grupo.appendChild(coluna);
+    grupo.appendChild(nomeMes);
+
+    barras.appendChild(grupo);
+  });
+
+  grafico.appendChild(barras);
+}
+
+// ========================================
+// 13. EDITAR MOVIMENTAÇÃO
 // ========================================
 
 function editarMovimentacao(id) {
-  const movimentacao = movimentacoes.find(function (item) {
-    return Number(item.id) === Number(id);
-  });
+  const movimentacao = movimentacoes.find((item) => Number(item.id) === Number(id));
 
   if (!movimentacao) {
     alert("Movimentação não encontrada.");
@@ -380,12 +596,7 @@ function editarMovimentacao(id) {
   document.querySelector("#tipo").value = movimentacao.tipo;
   document.querySelector("#categoria").value = movimentacao.categoria;
 
-  const dataTexto =
-    typeof movimentacao.data === "string"
-      ? movimentacao.data.slice(0, 10)
-      : new Date(movimentacao.data).toISOString().slice(0, 10);
-
-  document.querySelector("#data").value = dataTexto;
+  document.querySelector("#data").value = String(movimentacao.data).slice(0, 10);
 
   idEmEdicao = movimentacao.id;
 
@@ -393,14 +604,14 @@ function editarMovimentacao(id) {
   botaoSalvar.textContent = "Salvar alterações";
   botaoCancelar.style.display = "inline-block";
 
-  formulario.scrollIntoView({
+  document.querySelector("#receitas").scrollIntoView({
     behavior: "smooth",
     block: "start",
   });
 }
 
 // ========================================
-// 12. CANCELAR EDIÇÃO
+// 14. CANCELAR EDIÇÃO
 // ========================================
 
 function cancelarEdicao() {
@@ -416,7 +627,7 @@ function cancelarEdicao() {
 botaoCancelar.addEventListener("click", cancelarEdicao);
 
 // ========================================
-// 13. EXCLUIR MOVIMENTAÇÃO
+// 15. EXCLUIR MOVIMENTAÇÃO
 // ========================================
 
 async function excluirMovimentacao(id) {
@@ -456,10 +667,10 @@ async function excluirMovimentacao(id) {
 }
 
 // ========================================
-// 14. CADASTRAR OU ATUALIZAR
+// 16. CADASTRAR OU ATUALIZAR
 // ========================================
 
-formulario.addEventListener("submit", async function (event) {
+formulario.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const descricao = document.querySelector("#descricao").value.trim();
@@ -467,6 +678,11 @@ formulario.addEventListener("submit", async function (event) {
   const tipo = document.querySelector("#tipo").value;
   const categoria = document.querySelector("#categoria").value;
   const data = document.querySelector("#data").value;
+
+  if (!descricao || !valor || valor <= 0 || !tipo || !categoria || !data) {
+    alert("Preencha todos os campos corretamente.");
+    return;
+  }
 
   const movimentacao = {
     descricao,
@@ -509,10 +725,7 @@ formulario.addEventListener("submit", async function (event) {
     );
 
     cancelarEdicao();
-
     await carregarMovimentacoes();
-
-    console.log("Operação realizada:", resultado);
   } catch (erro) {
     console.error("Erro ao salvar movimentação:", erro);
     alert(erro.message);
@@ -520,7 +733,7 @@ formulario.addEventListener("submit", async function (event) {
 });
 
 // ========================================
-// 15. INICIAR A APLICAÇÃO
+// 17. INICIAR A APLICAÇÃO
 // ========================================
 
 carregarMovimentacoes();

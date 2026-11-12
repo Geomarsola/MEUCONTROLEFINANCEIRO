@@ -1,141 +1,611 @@
 /* ========================================
-   PAINEL PRINCIPAL - MEU CONTROLE FINANCEIRO
+   1. CONFIGURAÇÕES GERAIS
 ======================================== */
 
 * {
   box-sizing: border-box;
 }
 
+:root {
+  --verde-escuro: #14532d;
+  --verde: #21834a;
+  --verde-claro: #e8f5ec;
+  --fundo: #f5f7f6;
+  --texto: #26352a;
+  --texto-secundario: #78847b;
+  --borda: #e5ebe6;
+  --branco: #ffffff;
+  --vermelho: #dc4545;
+  --azul: #3975c6;
+}
+
 body:not(.pagina-autenticacao) {
   margin: 0;
   min-height: 100vh;
-  background: #f1f8f2;
-  color: #26352a;
+  background: var(--fundo);
+  color: var(--texto);
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* CABEÇALHO */
+/* ========================================
+   2. ESTRUTURA DO DASHBOARD
+======================================== */
 
-body:not(.pagina-autenticacao) header {
-  background: linear-gradient(135deg, #1b5e20, #2e7d32);
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ========================================
+   3. MENU LATERAL
+======================================== */
+
+.sidebar {
+  width: 255px;
+  min-height: 100vh;
+  padding: 28px 18px;
+  display: flex;
+  flex-direction: column;
+  background: var(--verde-escuro);
   color: white;
-  padding: 30px 7%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 100;
+}
+
+.sidebar-logo {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 20px;
-  box-shadow: 0 4px 15px rgba(27, 94, 32, 0.18);
+  gap: 12px;
+  padding: 0 10px 35px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-body:not(.pagina-autenticacao) header h1 {
-  margin: 0 0 8px;
-  font-size: 28px;
+.logo-icon {
+  width: 43px;
+  height: 43px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  color: var(--verde-escuro);
+  border-radius: 12px;
+  font-size: 23px;
+  font-weight: bold;
 }
 
-body:not(.pagina-autenticacao) header p {
+.sidebar-logo h2 {
   margin: 0;
-  color: #e8f5e9;
+  font-size: 17px;
 }
 
-body:not(.pagina-autenticacao) .usuario-logado {
+.sidebar-logo span {
+  display: block;
+  margin-top: 4px;
+  color: #c8e6ce;
+  font-size: 12px;
+}
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: 35px;
+}
+
+.menu-titulo {
+  margin: 0 10px 12px;
+  color: #a8cdb1;
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.menu-link {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 13px;
+  padding: 14px 13px;
+  border-radius: 9px;
+  color: #e2f1e5;
+  text-decoration: none;
+  font-size: 14px;
+  transition: 0.2s;
 }
 
-/* BOTÃO SAIR */
+.menu-link span {
+  width: 22px;
+  font-size: 20px;
+  text-align: center;
+}
+
+.menu-link:hover,
+.menu-link.ativo {
+  background: rgba(255, 255, 255, 0.14);
+  color: white;
+}
+
+.sidebar-rodape {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+  padding: 20px 5px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.usuario-avatar {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: white;
+  color: var(--verde-escuro);
+  font-weight: bold;
+  font-size: 17px;
+}
+
+.usuario-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.usuario-info strong {
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.usuario-info span {
+  color: #c8e6ce;
+  font-size: 11px;
+}
 
 #btn-sair {
-  padding: 10px 20px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  width: 35px;
+  height: 35px;
+  border: none;
   border-radius: 8px;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.12);
   color: white;
+  font-size: 20px;
   cursor: pointer;
-  font-weight: bold;
   transition: 0.2s;
 }
 
 #btn-sair:hover {
   background: white;
-  color: #1b5e20;
+  color: var(--verde-escuro);
 }
 
-/* CONTEÚDO PRINCIPAL */
+/* ========================================
+   4. CONTEÚDO PRINCIPAL
+======================================== */
 
-body:not(.pagina-autenticacao) main {
-  width: 90%;
-  max-width: 1200px;
-  margin: 35px auto;
+.dashboard-conteudo {
+  width: calc(100% - 255px);
+  min-height: 100vh;
+  margin-left: 255px;
 }
 
-/* SEÇÕES */
-
-body:not(.pagina-autenticacao) main section {
-  margin-bottom: 30px;
-  padding: 28px;
-  background: white;
-  border: 1px solid #dce8dd;
-  border-radius: 15px;
-  box-shadow: 0 5px 18px rgba(27, 94, 32, 0.06);
+.dashboard-main {
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 30px 35px;
 }
 
-body:not(.pagina-autenticacao) main section h2 {
-  margin-top: 0;
-  margin-bottom: 22px;
-  color: #1b5e20;
-  font-size: 22px;
-}
+/* ========================================
+   5. CABEÇALHO
+======================================== */
 
-/* CARDS DO RESUMO */
-
-.cards-resumo {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+body:not(.pagina-autenticacao) .topbar {
+  min-height: 90px;
+  padding: 20px 35px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 20px;
+  background: white;
+  border-bottom: 1px solid var(--borda);
 }
 
-.card {
-  padding: 22px;
-  border-radius: 12px;
-  background: #f1f8f2;
-  border: 1px solid #dce8dd;
+.topbar h1 {
+  margin: 0 0 7px;
+  color: var(--verde-escuro);
+  font-size: 23px;
 }
 
-.cards-resumo .card:nth-child(1) {
-  background: #e8f5e9;
-  border-left: 5px solid #219653;
+.topbar p {
+  margin: 0;
+  color: var(--texto-secundario);
+  font-size: 13px;
 }
 
-.cards-resumo .card:nth-child(2) {
-  background: #fff0f0;
-  border-left: 5px solid #dc4545;
+.topbar-usuario {
+  padding: 11px 16px;
+  border-radius: 9px;
+  background: var(--verde-claro);
+  color: var(--verde-escuro);
+  font-size: 13px;
 }
 
-.cards-resumo .card:nth-child(3) {
-  background: #e8f0fe;
-  border-left: 5px solid #3975c6;
+/* ========================================
+   6. BOAS-VINDAS
+======================================== */
+
+.secao-boas-vindas {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 28px;
+  padding: 27px 30px;
+  border-radius: 14px;
+  background: linear-gradient(120deg, #14532d, #21834a);
+  color: white;
+  box-shadow: 0 6px 20px rgba(20, 83, 45, 0.12);
 }
 
-.card h3 {
-  margin-top: 0;
-  color: #526354;
-  font-size: 15px;
-}
-
-.card p {
-  margin-bottom: 0;
-  font-size: 25px;
+.texto-destaque {
+  color: #c8e6ce;
+  font-size: 10px;
   font-weight: bold;
-  color: #1b5e20;
+  letter-spacing: 1.5px;
 }
 
-/* FORMULÁRIO */
+.secao-boas-vindas h2 {
+  margin: 10px 0;
+  font-size: 23px;
+}
+
+.secao-boas-vindas p {
+  margin: 0;
+  color: #e0f0e3;
+  font-size: 13px;
+}
+
+#btn-nova-movimentacao {
+  padding: 13px 18px;
+  border: none;
+  border-radius: 8px;
+  background: white;
+  color: var(--verde-escuro);
+  font-weight: bold;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: 0.2s;
+}
+
+#btn-nova-movimentacao:hover {
+  background: #e8f5e9;
+  transform: translateY(-2px);
+}
+
+/* ========================================
+   7. CARDS FINANCEIROS
+======================================== */
+
+.secao-resumo {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.card-resumo {
+  padding: 23px;
+  background: white;
+  border: 1px solid var(--borda);
+  border-radius: 13px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.025);
+  transition: 0.2s;
+}
+
+.card-resumo:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.06);
+}
+
+.card-resumo-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--texto-secundario);
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.card-icone {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: var(--verde-claro);
+  color: var(--verde);
+  font-size: 17px;
+  font-weight: bold;
+}
+
+.card-resumo h2 {
+  margin: 20px 0 8px;
+  color: var(--texto);
+  font-size: clamp(19px, 2vw, 25px);
+  overflow-wrap: anywhere;
+}
+
+.card-resumo p {
+  margin: 0;
+  color: var(--texto-secundario);
+  font-size: 12px;
+}
+
+.receita-card {
+  border-bottom: 3px solid #219653;
+}
+
+.receita-card .card-icone {
+  background: #e8f5e9;
+  color: #219653;
+}
+
+.despesa-card {
+  border-bottom: 3px solid var(--vermelho);
+}
+
+.despesa-card .card-icone {
+  background: #ffebee;
+  color: var(--vermelho);
+}
+
+.saldo-card {
+  border-bottom: 3px solid var(--azul);
+}
+
+.saldo-card .card-icone {
+  background: #e8f0fe;
+  color: var(--azul);
+}
+
+/* ========================================
+   8. SEÇÕES DO DASHBOARD
+======================================== */
+
+.dashboard-main > section:not(.secao-boas-vindas) {
+  margin-bottom: 25px;
+  padding: 25px;
+  border: 1px solid var(--borda);
+  border-radius: 13px;
+  background: white;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.025);
+}
+
+.secao-titulo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 23px;
+}
+
+.secao-titulo h2 {
+  margin: 0 0 7px;
+  color: var(--verde-escuro);
+  font-size: 18px;
+}
+
+.secao-titulo p {
+  margin: 0;
+  color: var(--texto-secundario);
+  font-size: 12px;
+}
+
+/* ========================================
+   9. GRÁFICO MENSAL
+======================================== */
+
+.grafico-legenda {
+  display: flex;
+  justify-content: flex-end;
+  gap: 20px;
+  margin-bottom: 15px;
+}
+
+.grafico-legenda span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--texto-secundario);
+  font-size: 11px;
+}
+
+.grafico-legenda i {
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  border-radius: 3px;
+}
+
+.legenda-receita {
+  background: #219653;
+}
+
+.legenda-despesa {
+  background: #e05a5a;
+}
+
+.grafico-barras {
+  height: 230px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 15px;
+  padding-top: 10px;
+  border-bottom: 1px solid var(--borda);
+}
+
+.grafico-grupo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  min-width: 0;
+}
+
+.grafico-coluna {
+  width: 100%;
+  max-width: 65px;
+  height: 190px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 5px;
+}
+
+.barra {
+  width: 35%;
+  min-height: 3px;
+  border-radius: 5px 5px 0 0;
+  transition: height 0.4s ease;
+}
+
+.barra.receita {
+  background: #219653;
+}
+
+.barra.despesa {
+  background: #e05a5a;
+}
+
+.grafico-mes {
+  padding-bottom: 9px;
+  color: var(--texto-secundario);
+  font-size: 11px;
+  text-transform: capitalize;
+}
+
+/* ========================================
+   10. MOVIMENTAÇÕES
+======================================== */
+
+#lista-movimentacoes {
+  display: flex;
+  flex-direction: column;
+}
+
+.movimentacao-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 16px 5px;
+  border-bottom: 1px solid var(--borda);
+}
+
+.movimentacao-item:last-child {
+  border-bottom: none;
+}
+
+.movimentacao-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: 6px;
+}
+
+.movimentacao-info strong {
+  color: var(--texto);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.movimentacao-info span {
+  color: var(--texto-secundario);
+  font-size: 11px;
+  text-transform: capitalize;
+}
+
+.movimentacao-valor {
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.movimentacao-item.receita .movimentacao-valor {
+  color: #219653;
+}
+
+.movimentacao-item.despesa .movimentacao-valor {
+  color: var(--vermelho);
+}
+
+.movimentacao-acoes {
+  display: flex;
+  gap: 7px;
+}
+
+.movimentacao-acoes button {
+  padding: 7px 10px;
+  border: none;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-editar {
+  background: #e8f5e9;
+  color: var(--verde-escuro);
+}
+
+.btn-editar:hover {
+  background: #c8e6c9;
+}
+
+.btn-excluir {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.btn-excluir:hover {
+  background: #ffcdd2;
+}
+
+.lista-vazia {
+  padding: 35px 15px;
+  text-align: center;
+}
+
+.lista-vazia span {
+  font-size: 35px;
+}
+
+.lista-vazia p {
+  margin: 12px 0 6px;
+  color: var(--texto);
+  font-weight: bold;
+}
+
+.lista-vazia small {
+  color: var(--texto-secundario);
+}
+
+/* ========================================
+   11. FORMULÁRIO
+======================================== */
 
 #form-movimentacao {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
 }
 
@@ -146,8 +616,8 @@ body:not(.pagina-autenticacao) main section h2 {
 }
 
 #form-movimentacao label {
-  color: #26352a;
-  font-size: 14px;
+  color: var(--texto);
+  font-size: 13px;
   font-weight: bold;
 }
 
@@ -155,27 +625,33 @@ body:not(.pagina-autenticacao) main section h2 {
 #form-movimentacao select {
   width: 100%;
   padding: 13px;
-  border: 1px solid #c8dfca;
+  border: 1px solid #dce5dd;
   border-radius: 8px;
   background: #fbfdfb;
-  color: #26352a;
-  font-size: 15px;
+  color: var(--texto);
+  font-size: 14px;
   outline: none;
+  transition: 0.2s;
 }
 
 #form-movimentacao input:focus,
 #form-movimentacao select:focus {
-  border-color: #2e7d32;
-  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.12);
+  border-color: var(--verde);
+  box-shadow: 0 0 0 3px rgba(33, 131, 74, 0.1);
 }
 
-/* BOTÕES DO FORMULÁRIO */
+.botoes-formulario {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  grid-column: 1 / -1;
+}
 
 #form-movimentacao button {
-  padding: 14px 20px;
+  padding: 13px 20px;
   border: none;
   border-radius: 8px;
-  background: #1b5e20;
+  background: var(--verde-escuro);
   color: white;
   font-weight: bold;
   cursor: pointer;
@@ -183,99 +659,179 @@ body:not(.pagina-autenticacao) main section h2 {
 }
 
 #form-movimentacao button:hover {
-  background: #2e7d32;
-  transform: translateY(-2px);
+  background: var(--verde);
+  transform: translateY(-1px);
 }
 
-#btn-cancelar {
-  background: #718074 !important;
+#form-movimentacao #btn-cancelar {
+  background: #718074;
 }
 
-/* LISTA DE MOVIMENTAÇÕES */
-
-#lista-movimentacoes {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
+#form-movimentacao #btn-cancelar:hover {
+  background: #526354;
 }
 
-#lista-movimentacoes .card {
-  background: #ffffff;
-  border-left: 5px solid #219653;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+/* ========================================
+   12. RODAPÉ
+======================================== */
+
+.dashboard-footer {
+  padding: 10px 0 20px;
+  color: var(--texto-secundario);
+  font-size: 11px;
+  text-align: center;
 }
 
-#lista-movimentacoes .card.despesa {
-  border-left-color: #dc4545;
-}
+/* ========================================
+   13. RESPONSIVIDADE
+======================================== */
 
-#lista-movimentacoes .card h3 {
-  color: #1b5e20;
-  font-size: 18px;
-}
-
-#lista-movimentacoes .card p {
-  font-size: 15px;
-  color: #526354;
-}
-
-#lista-movimentacoes .card button {
-  padding: 9px 15px;
-  margin-right: 8px;
-  border: none;
-  border-radius: 7px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-#lista-movimentacoes .btn-editar {
-  background: #e8f5e9;
-  color: #1b5e20;
-}
-
-#lista-movimentacoes .btn-excluir {
-  background: #ffebee;
-  color: #c62828;
-}
-
-/* RESPONSIVIDADE */
-
-@media (max-width: 750px) {
-  body:not(.pagina-autenticacao) header {
-    padding: 25px;
-    flex-direction: column;
-    align-items: flex-start;
+@media (max-width: 1050px) {
+  .sidebar {
+    width: 220px;
   }
 
-  .cards-resumo {
+  .dashboard-conteudo {
+    width: calc(100% - 220px);
+    margin-left: 220px;
+  }
+
+  .dashboard-main {
+    padding: 25px 20px;
+  }
+
+  body:not(.pagina-autenticacao) .topbar {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 750px) {
+  .dashboard-layout {
+    display: block;
+  }
+
+  .sidebar {
+    position: relative;
+    width: 100%;
+    min-height: auto;
+    padding: 15px;
+  }
+
+  .sidebar-logo {
+    padding-bottom: 15px;
+  }
+
+  .sidebar-menu {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: 15px;
+  }
+
+  .menu-titulo {
+    width: 100%;
+  }
+
+  .menu-link {
+    padding: 10px;
+    font-size: 12px;
+  }
+
+  .menu-link span {
+    width: auto;
+  }
+
+  .sidebar-rodape {
+    margin-top: 15px;
+    padding-top: 12px;
+  }
+
+  .dashboard-conteudo {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .secao-resumo {
     grid-template-columns: 1fr;
+  }
+
+  .secao-boas-vindas {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   #form-movimentacao {
     grid-template-columns: 1fr;
   }
 
-  #lista-movimentacoes {
-    grid-template-columns: 1fr;
+  .grafico-barras {
+    gap: 5px;
   }
 
-  body:not(.pagina-autenticacao) main {
-    width: 94%;
+  .movimentacao-item {
+    flex-wrap: wrap;
   }
 }
 
 @media (max-width: 480px) {
-  body:not(.pagina-autenticacao) main section {
-    padding: 20px;
+  .dashboard-main {
+    padding: 18px 12px;
   }
 
-  body:not(.pagina-autenticacao) header h1 {
-    font-size: 23px;
+  body:not(.pagina-autenticacao) .topbar {
+    padding: 18px 15px;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .topbar h1 {
+    font-size: 20px;
+  }
+
+  .secao-boas-vindas {
+    padding: 22px;
+  }
+
+  .secao-boas-vindas h2 {
+    font-size: 19px;
+  }
+
+  .dashboard-main > section:not(.secao-boas-vindas) {
+    padding: 18px 14px;
+  }
+
+  .card-resumo {
+    padding: 18px;
+  }
+
+  .movimentacao-acoes {
+    width: 100%;
+  }
+
+  .movimentacao-acoes button {
+    flex: 1;
+  }
+
+  .grafico-barras {
+    height: 190px;
+  }
+
+  .grafico-coluna {
+    height: 150px;
+  }
+
+  .botoes-formulario {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .botoes-formulario button {
+    width: 100%;
   }
 }
 
 /* ========================================
-   CORREÇÃO FINAL - LOGIN E CADASTRO
+   14. LOGIN E CADASTRO
+   MANTER ESTILOS DAS AUTENTICAÇÕES
 ======================================== */
 
 body.pagina-autenticacao {
